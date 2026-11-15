@@ -2,7 +2,7 @@
   "name": "さいていげん — 大人の身だしなみ・生活力",
   "short_name": "さいていげん",
   "lang": "ja",
-  "start_url": "./#/home",
+  "start_url": "./#/map",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f6f5f2",

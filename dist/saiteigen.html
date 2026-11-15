@@ -222,20 +222,81 @@ li.row { padding: 10px 14px; }
 .tile .badge { align-self: flex-start; }
 .list.compact { margin-top: 10px; }
 
+/* ---- さいていげんマップ ---- */
+:root { --lv1: #c2410c; --lv1-soft: #fdebe0; --lv2: #2f5d50; --lv2-soft: #dfeae5; --lv3: #6b4fa0; --lv3-soft: #ece6f5; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --lv1: #ff9d6c; --lv1-soft: #3a2418; --lv2: #7cc0a8; --lv2-soft: #1f3530; --lv3: #c7b3ee; --lv3-soft: #2d2540; } }
+:root[data-theme="dark"] { --lv1: #ff9d6c; --lv1-soft: #3a2418; --lv2: #7cc0a8; --lv2-soft: #1f3530; --lv3: #c7b3ee; --lv3-soft: #2d2540; }
+
+.cta { display: block; color: var(--text); border-color: var(--accent); background: var(--accent-soft); }
+.cta strong { color: var(--accent); font-size: 16px; }
+.cta .sub { display: block; margin-top: 4px; }
+
+.lvsum { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+.lv { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+.lvname { font-size: 12px; font-weight: 700; }
+.lvnum { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.lvnum small { font-size: 13px; color: var(--muted); font-weight: 500; }
+.lv1 .lvname { color: var(--lv1); } .lv1 .bar span { background: var(--lv1); }
+.lv2 .lvname { color: var(--lv2); } .lv2 .bar span { background: var(--lv2); }
+.lv3 .lvname { color: var(--lv3); } .lv3 .bar span { background: var(--lv3); }
+
+.seg { overflow-x: auto; scrollbar-width: none; }
+.seg a { white-space: nowrap; min-width: max-content; padding-left: 8px; padding-right: 8px; }
+
+.legend { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+.legend > span { display: inline-flex; align-items: center; gap: 4px; }
+.legend .mark { width: 16px; height: 16px; font-size: 10px; }
+
+.area h2 { color: var(--text); font-size: 17px; }
+.lvrow { display: flex; gap: 8px; margin-bottom: 8px; }
+.lvtag { flex-shrink: 0; width: 46px; border-radius: 10px; font-size: 12px; font-weight: 700; text-align: center; padding: 8px 2px; line-height: 1.3; }
+.lvtag small { font-size: 10px; font-weight: 600; }
+.lvtag.lv1 { background: var(--lv1-soft); color: var(--lv1); }
+.lvtag.lv2 { background: var(--lv2-soft); color: var(--lv2); }
+.lvtag.lv3 { background: var(--lv3-soft); color: var(--lv3); }
+.lvtag.inline { width: auto; display: inline-block; padding: 2px 8px; border-radius: 99px; }
+.mtiles { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.mtile { display: flex; align-items: flex-start; gap: 6px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 8px; color: var(--text); font-size: 13px; line-height: 1.35; min-height: 52px; }
+.mtile .mt { min-width: 0; }
+.mark { flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; display: inline-grid; place-items: center; font-size: 11px; font-weight: 800; background: var(--surface-2); color: var(--muted); }
+.st-ok .mark { background: var(--ok); color: var(--surface); }
+.st-doing .mark { background: var(--accent); color: var(--accent-ink); }
+.st-gap .mark { background: var(--lv1); color: #fff; }
+.st-skip { opacity: .5; }
+.mtile.st-gap { border-color: var(--lv1); }
+.mtile.st-ok { background: var(--ok-soft); border-color: transparent; }
+.badge.st-ok { background: var(--ok-soft); color: var(--ok); }
+.badge.st-gap { background: var(--lv1-soft); color: var(--lv1); }
+.badge.st-doing { background: var(--accent-soft); color: var(--accent); }
+
+.cardhead { display: flex; gap: 8px; align-items: center; margin-top: 4px; }
+.ctitle { font-size: 24px; line-height: 1.35; margin: 8px 0 4px; }
+.how { margin: 6px 0 0; padding-left: 22px; }
+.how li { margin: 4px 0; }
+.sneaky { background: var(--lv3-soft); border-color: transparent; }
+.pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 24px; font-size: 13px; }
+.pager a { max-width: 48%; }
+.pager a:last-child { text-align: right; }
+
+.diag { margin-top: 16px; padding: 20px 16px; }
+.diag .q { font-size: 20px; font-weight: 700; line-height: 1.5; margin: 10px 0 18px; }
+.diag-btns { display: flex; flex-direction: column; gap: 8px; }
+.diag-btns .btn { min-height: 50px; font-size: 16px; }
+
 </style>
 </head>
 <body>
 <main id="app" aria-live="polite"></main>
 <nav class="tabbar" aria-label="メイン">
-  <a href="#/home" data-tab="home"><span>🏠</span>ホーム</a>
-  <a href="#/learn" data-tab="learn"><span>📚</span>学ぶ</a>
+  <a href="#/map" data-tab="map"><span>🗺️</span>マップ</a>
+  <a href="#/home" data-tab="home"><span>✅</span>今日</a>
   <a href="#/habits" data-tab="habits"><span>🔁</span>習慣</a>
   <a href="#/belongings" data-tab="own"><span>🎒</span>持ち物</a>
   <a href="#/my" data-tab="my"><span>👤</span>マイ</a>
 </nav>
 <div id="sheet" class="sheet"></div>
 <div id="toast" class="toast" role="status"></div>
-<script>window.SAITEIGEN_VERSION = '0.1.0';</script>
+<script>window.SAITEIGEN_VERSION = '0.2.0';</script>
 <script>
 /*
  * カテゴリー・項目データ
@@ -806,12 +867,279 @@ window.SAITEIGEN_CONTENT = [
 
 </script>
 <script>
+/*
+ * さいていげんマップ（地図）
+ * ------------------------------------------------------------
+ * 「普通の人が当たり前にやっていること」を分野 × レベルで並べたもの。
+ *
+ *   level 1 = 最低限（やってないと気づかれる）
+ *   level 2 = 普通（多くの人がやっている）
+ *   level 3 = プラス（やると一段よくなる）
+ *
+ * カードのフィールド
+ *   id      : 一意のID（記録と紐付くので変更しない）
+ *   area    : 分野 id
+ *   level   : 1 / 2 / 3
+ *   title   : やること
+ *   q       : 診断の質問（「はい」＝できている）
+ *   why     : なぜ（人からどう見えるか）
+ *   how     : やり方（3行くらい）
+ *   cost    : 費用の目安
+ *   time    : 時間・頻度の目安
+ *   sneaky  : こっそり始めるコツ（任意）
+ *   habit   : 習慣に登録するときのひな型 { name, freq, interval }
+ *   item    : 詳しい項目（js/data.js）の id（任意）
+ *   for     : 対象 'all'（将来 'men' / 'women' などで分ける余地）
+ *
+ * 【注意】本文は編集中の下書きです。健康・安全に関わる内容は、製品の表示や専門家の情報を優先してください。
+ */
+
+window.SAITEIGEN_MAP = {
+  levels: [
+    { level: 1, name: '最低限', desc: 'やってないと気づかれる' },
+    { level: 2, name: '普通', desc: '多くの人がやっている' },
+    { level: 3, name: 'プラス', desc: 'やると一段よくなる' }
+  ],
+  areas: [
+    { id: 'look', name: '見た目', icon: '🪞' },
+    { id: 'smell', name: '匂い', icon: '🫧' },
+    { id: 'things', name: '持ち物・服', icon: '🎒' },
+    { id: 'know', name: '振る舞い・常識', icon: '💬' }
+  ],
+  cards: [
+    // ===== 見た目 =====
+    { id: 'm-nail', area: 'look', level: 1, title: '爪を短く切っておく', q: '最近1週間以内に爪を確認・カットした？',
+      why: '手は人からよく見られます。伸びた爪や爪の間の汚れは、清潔感がないと受け取られやすいポイントです。',
+      how: ['白い部分が少し残るくらいに切る', '角はやすりで軽く丸める', '爪の間の汚れは入浴時にブラシで落とす'],
+      cost: '爪切り 数百円〜', time: '週1回・5分', habit: { name: '爪を切る', freq: 'weekly' }, item: 'nail' },
+    { id: 'm-nosehair', area: 'look', level: 1, title: '鼻毛が出ていないか確認する', q: '鼻毛が出ていないか、鏡で確認する習慣がある？',
+      why: '本人は気づきにくく、周りは指摘しにくい代表例です。会話中に目に入りやすい位置にあります。',
+      how: ['明るい場所で、鏡を下から見上げるように確認', '出ている毛だけを鼻毛用ハサミかトリマーで切る', '抜くのではなく切る'],
+      cost: '鼻毛ハサミ 数百円／トリマー 千円〜', time: '週1回・2分',
+      sneaky: '鼻毛ハサミは小さく、爪切りと一緒にポーチに入れておけば目立ちません。',
+      habit: { name: '鼻毛チェック', freq: 'weekly' }, item: 'nose-hair' },
+    { id: 'm-bedhair', area: 'look', level: 1, title: '寝ぐせを直してから出かける', q: '出かける前に、寝ぐせがないか鏡で確認している？',
+      why: '寝ぐせは「朝そのまま出てきた」ように見え、だらしない印象につながりやすいです。',
+      how: ['はねている部分を根元から水で濡らす', 'ドライヤーで根元から乾かす', '出る前に横・後ろも鏡で確認'],
+      cost: '0円', time: '毎朝・3分', habit: { name: '寝ぐせチェック', freq: 'daily' }, item: 'dryer' },
+    { id: 'm-teeth', area: 'look', level: 1, title: '朝晩歯を磨く', q: '朝と夜、毎日歯を磨いている？',
+      why: '歯の汚れや口臭は会話の距離で伝わります。',
+      how: ['朝と寝る前に磨く', '歯と歯ぐきの境目を意識する', '歯ブラシは毛先が開いたら交換'],
+      cost: '歯ブラシ 数百円', time: '毎日・朝晩3分', habit: { name: '歯磨き（朝晩）', freq: 'daily' }, item: 'teeth' },
+    { id: 'm-face-check', area: 'look', level: 1, title: '出かける前に顔を鏡で見る', q: '出かける前に、目やに・口の周り・鼻を鏡で確認している？',
+      why: '目やにや食べかすは自分では見えず、一瞬で気づかれます。',
+      how: ['目頭・口の端・鼻の下を見る', '歯に何か付いていないか見る', '髪と服の肩（フケ・ホコリ）も見る'],
+      cost: '0円', time: '毎朝・30秒', habit: { name: '出発前の鏡チェック', freq: 'daily' } },
+    { id: 'm-beard', area: 'look', level: 1, title: '髭を剃る・整える', q: '髭（産毛を含む）を剃り残しなく処理できている？',
+      why: '無精髭や剃り残しは、狙った髭スタイルでない限り手入れ不足に見えやすいです。',
+      how: ['洗顔で肌をやわらかくしてから剃る', '毛の流れに沿って剃る', '剃ったあとは保湿'],
+      cost: 'カミソリ・シェーバー 数百円〜', time: '毎日〜2日に1回・5分', habit: { name: '髭を剃る', freq: 'daily' }, item: 'beard', for: 'all' },
+    { id: 'm-haircut', area: 'look', level: 1, title: '髪を伸ばしっぱなしにしない', q: '最後に髪を切ってから2か月以内？',
+      why: '伸びすぎた髪は形が崩れて、手入れしていない印象になりやすいです。',
+      how: ['1〜2か月に1回を目安に切る', '前回と同じでよければ「前回と同じで」と伝える', '次の予約を帰りにしてしまうと楽'],
+      cost: '数千円', time: '1〜2か月に1回', habit: { name: '髪を切る', freq: 'irregular', interval: 45 }, item: 'salon' },
+
+    { id: 'm-brow', area: 'look', level: 2, title: '眉毛を整える', q: '眉毛を整えたことがある・定期的に整えている？',
+      why: '眉は顔の印象を大きく左右する割に、自分では見慣れていて気づきにくい部分です。',
+      how: ['眉用コームでとかし、はみ出た長い毛を眉ハサミで切る', '眉の形から明らかに外れた毛（眉間・まぶた）だけ処理', '細くしすぎない。迷ったら残す'],
+      cost: '眉ハサミ・コーム 数百円／サロン 数千円', time: '2〜4週間に1回・10分',
+      sneaky: '最初の1回だけ眉毛サロンに行き、その形を自分で維持するのが失敗しにくい方法です。道具は小さいので筆箱やポーチに入ります。',
+      habit: { name: '眉毛の手入れ', freq: 'irregular', interval: 14 }, item: 'brow' },
+    { id: 'm-facewash', area: 'look', level: 2, title: '洗顔料で顔を洗う', q: '洗顔料（洗顔フォーム等）を使って顔を洗っている？',
+      why: '皮脂やテカリ、ニキビの予防の基本として広く案内されています。',
+      how: ['よく泡立てる', 'こすらず泡で洗う', 'ぬるま湯でしっかりすすぐ'],
+      cost: '洗顔料 数百円〜', time: '毎日・朝晩2分', habit: { name: '洗顔', freq: 'daily' }, item: 'face-wash' },
+    { id: 'm-moist', area: 'look', level: 2, title: '洗顔・お風呂のあとに保湿する', q: '洗顔やお風呂のあとに、化粧水・乳液などで保湿している？',
+      why: '乾燥による粉ふき・肌荒れを防ぎます。性別問わず基本のケアとされています。',
+      how: ['洗顔後、早めに化粧水をなじませる', '乳液かクリームでふたをする', '面倒ならオールインワンジェル1本でもOK'],
+      cost: '千円前後〜', time: '毎日・1分',
+      sneaky: 'オールインワンジェルなら1本で済み、洗面所に置いても目立ちにくいです。',
+      habit: { name: '保湿', freq: 'daily' }, item: 'moisture' },
+    { id: 'm-hairset', area: 'look', level: 2, title: '髪をセットする', q: '出かける前に、ワックス等で髪を整えている？',
+      why: '同じ髪型でも、セットの有無で「整えている人」に見えるかが変わります。',
+      how: ['ドライヤーで根元から乾かして形を作る', 'ワックスは少量（小指の先くらい）を手のひらで伸ばす', '後ろ→横→前の順につける'],
+      cost: 'ワックス 千円前後', time: '毎朝・5分',
+      sneaky: '美容院で「家でのセットのやり方を教えてください」と頼むと、自分の髪に合う方法を教えてもらえます。',
+      habit: { name: '髪のセット', freq: 'daily' }, item: 'styling' },
+    { id: 'm-floss', area: 'look', level: 2, title: 'フロス・歯間ブラシを使う', q: 'フロスか歯間ブラシを使っている？',
+      why: '歯ブラシだけでは歯の間の汚れが残りやすく、口臭の原因にもなります。',
+      how: ['夜の歯磨きのあとに使う', '歯ぐきを傷つけないようゆっくり', '歯間ブラシはサイズを合わせる'],
+      cost: '数百円', time: '毎日・2分', habit: { name: 'フロス', freq: 'daily' }, item: 'teeth' },
+    { id: 'm-dentist', area: 'look', level: 2, title: '歯医者で定期検診を受ける', q: '最近1年以内に歯医者で検診・クリーニングを受けた？',
+      why: '歯石や虫歯は自分では取れません。歯の色や口臭にも関わります。',
+      how: ['「検診とクリーニングをお願いします」と予約する', '痛くなくても行ってよい', '次回の目安を聞いておく'],
+      cost: '保険適用で数千円程度', time: '半年〜1年に1回', habit: { name: '歯科検診', freq: 'irregular', interval: 180 }, item: 'teeth' },
+    { id: 'm-lip', area: 'look', level: 2, title: '唇の乾燥を防ぐ', q: '唇がガサガサ・ひび割れしていない？',
+      why: '会話中に目に入る位置で、乾燥は意外と目立ちます。',
+      how: ['無香料のリップクリームを使う', '唇をなめない', '寝る前にも塗る'],
+      cost: '数百円', time: '乾燥する時期に毎日', item: 'lip' },
+    { id: 'm-order', area: 'look', level: 2, title: '美容院で髪型を伝えられる', q: '美容院で、なりたい髪型を写真などで伝えられる？',
+      why: '「おまかせ」や「短くしてください」だけだと、イメージ違いが起きやすいです。',
+      how: ['なりたい髪型の写真を2〜3枚スマホに保存しておく', '「普段セットしない／する」を伝える', '嫌なこと（耳を出したくない等）も伝える'],
+      cost: '0円', time: '美容院に行くとき', item: 'salon' },
+
+    { id: 'm-sunscreen', area: 'look', level: 3, title: '日焼け止めを使う', q: '外に長くいる日に日焼け止めを使っている？',
+      why: '日焼けによる肌ダメージを防ぐ目的で、皮膚科などでも推奨されています。',
+      how: ['外出前に顔・首・腕に塗る', '汗をかいたら塗り直す', '夜は洗顔で落とす'],
+      cost: '千円前後', time: '外出時', item: 'sunscreen' },
+    { id: 'm-bodyhair', area: 'look', level: 3, title: '気になる体毛を整える', q: '服装や場面に応じて、気になる体毛を処理できている？',
+      why: '必須ではありませんが、半袖・水着などのとき気にする人は多いです。',
+      how: ['剃るなら肌を濡らしてから', '電動トリマーで短くするだけでもよい', '処理後は保湿'],
+      cost: '千円〜', time: '必要なときに', item: 'body-hair' },
+
+    // ===== 匂い =====
+    { id: 's-bath', area: 'smell', level: 1, title: '毎日、体と頭を洗う', q: '毎日お風呂かシャワーで、体と頭を洗っている？',
+      why: '体臭・頭皮の匂いの基本対策です。自分の匂いには鼻が慣れて気づけません。',
+      how: ['頭皮は指の腹でもみ洗い', '耳の後ろ・首・脇・足の指の間も洗う', 'シャンプーは泡が残らないようしっかりすすぐ'],
+      cost: '0円', time: '毎日', habit: { name: 'お風呂（体・頭を洗う）', freq: 'daily' }, item: 'body-odor' },
+    { id: 's-clothes', area: 'smell', level: 1, title: '同じ服を洗わずに続けて着ない', q: '肌に直接触れる服（下着・Tシャツ・靴下）は毎回洗っている？',
+      why: '汗を吸った服は時間がたつと臭います。本人は慣れて気づきにくいです。',
+      how: ['下着・Tシャツ・靴下は1回着たら洗う', '上着やパンツも汗をかいたら洗う', '着回しは洗った服で'],
+      cost: '0円', time: '毎日', item: 'cloth-odor' },
+    { id: 's-dry', area: 'smell', level: 1, title: '洗濯物はすぐ干して早く乾かす', q: '洗濯が終わったら、すぐに干している？',
+      why: '洗濯機に入れっぱなしや乾くのが遅いと、生乾き臭の原因になります。',
+      how: ['終わったらすぐ取り出す', '間隔をあけて干す', '部屋干しは扇風機や除湿機で風を当てる'],
+      cost: '0円', time: '洗濯のたび', item: 'namagawaki' },
+    { id: 's-socks', area: 'smell', level: 1, title: '靴下は毎日替える', q: '靴下を毎日替えている？',
+      why: '足は汗をかきやすく、匂いの出やすい場所です。座敷の店などで気づかれます。',
+      how: ['毎日新しい靴下にする', '穴があいたら捨てる', '靴を脱ぐ予定の日は特に気をつける'],
+      cost: '0円', time: '毎日', item: 'socks' },
+
+    { id: 's-deo', area: 'smell', level: 2, title: '制汗剤・デオドラントを使う', q: '朝、制汗剤やデオドラントを使っている？',
+      why: '汗と脇の匂い対策として、多くの人が日常的に使っています。',
+      how: ['朝、乾いた脇に使う', 'スプレー・ロールオン・スティックなど好みで選ぶ', '香りが強いものは避けると無難'],
+      cost: '数百円〜', time: '毎朝・10秒',
+      sneaky: 'ドラッグストアで普通に売っていて、使っている人も多いので恥ずかしいものではありません。無香料タイプなら家族にも気づかれにくいです。',
+      habit: { name: '制汗剤', freq: 'daily' }, item: 'deodorant' },
+    { id: 's-breath', area: 'smell', level: 2, title: '口臭に気をつける', q: '舌の汚れや口の乾燥など、口臭対策を意識している？',
+      why: '口臭は自分で気づきにくく、指摘もされにくいです。',
+      how: ['歯磨き＋歯間ケアをする', '舌が白ければ、舌ブラシで軽く奥から手前へ', '水分をこまめにとって口の乾燥を防ぐ'],
+      cost: '数百円', time: '毎日', item: 'breath' },
+    { id: 's-towel', area: 'smell', level: 2, title: 'タオル・枕カバー・シーツを洗う', q: 'バスタオルは数回で、枕カバー・シーツは週1回くらいで洗っている？',
+      why: '寝具やタオルの匂いは、髪や体に移ります。',
+      how: ['顔を拭くタオルは毎回替える', '枕カバーは週1回以上', 'シーツは週1回〜2週に1回'],
+      cost: '0円', time: '週1回', habit: { name: 'シーツ・枕カバーを洗う', freq: 'weekly' }, item: 'bedding-odor' },
+    { id: 's-shoes', area: 'smell', level: 2, title: '毎日同じ靴を履かない', q: '靴を2足以上でローテーションしている？',
+      why: '靴は1日履くと汗を吸います。乾かす時間がないと匂いの原因になります。',
+      how: ['2足を交互に履く', '脱いだら風通しのよい場所で乾かす', '中敷きが洗えるなら洗う'],
+      cost: '靴1足分', time: '毎日', item: 'shoe-odor' },
+    { id: 's-washer', area: 'smell', level: 2, title: '洗濯槽を掃除する', q: '洗濯槽の掃除を、ここ2か月以内にした？',
+      why: '洗濯槽の汚れやカビは、洗った服の匂いの原因になります。',
+      how: ['洗濯槽クリーナーを買う', '製品の説明どおりに洗濯機を回す', '月1回が目安（製品の表示を確認）'],
+      cost: '数百円', time: '月1回', habit: { name: '洗濯槽の掃除', freq: 'monthly' }, item: 'washer-tub' },
+
+    { id: 's-perfume', area: 'smell', level: 3, title: '香りは「つけすぎない」', q: '香水や柔軟剤の香りが強すぎないか、気にしている？',
+      why: '香りは好みが分かれます。つけない選択も普通です。つけるなら少なめが無難です。',
+      how: ['香水は1〜2プッシュを、腰や手首など体の下の方に', '柔軟剤は表示の量を守る', '匂いを香りでごまかさない（まず洗う）'],
+      cost: '0円〜', time: '—', item: 'perfume' },
+
+    // ===== 持ち物・服 =====
+    { id: 't-handkerchief', area: 'things', level: 1, title: 'ハンカチを持ち歩く', q: '出かけるとき、ハンカチを持っている？',
+      why: 'トイレの後に手を拭けない・服で拭くのは、意外と見られています。',
+      how: ['毎日カバンかポケットに1枚', '使ったら洗う', '小さいタオルハンカチが楽'],
+      cost: '数百円', time: '毎日', item: 'handkerchief' },
+    { id: 't-worn', area: 'things', level: 1, title: '穴・ヨレ・シミのある服を着ない', q: '穴やヨレ、首元の伸び、取れないシミがある服を着ていない？',
+      why: '本人は着慣れていて気づきませんが、清潔感を一番落としやすいポイントです。',
+      how: ['首元・袖口・脇を明るい所で確認', 'ダメなものは部屋着にするか捨てる', '靴下と下着も同じ基準で'],
+      cost: '0円（買い替えは別）', time: '季節に1回', habit: { name: '傷んだ服の見直し', freq: 'seasonal' }, item: 'discard' },
+    { id: 't-wallet', area: 'things', level: 1, title: '財布をパンパンにしない', q: '財布にレシートや使わないカードが溜まっていない？',
+      why: '支払いのときに見られます。膨らんだ財布は形も崩れます。',
+      how: ['レシートは毎日出す', '使わないポイントカードは抜く', '小銭を溜めすぎない'],
+      cost: '0円', time: '週1回・2分', habit: { name: '財布の整理', freq: 'weekly' }, item: 'wallet' },
+
+    { id: 't-size', area: 'things', level: 2, title: 'サイズの合った服を着る', q: '肩・袖・裾の長さが合った服を着ている？',
+      why: '高い服や流行の服よりも、サイズ感が合っているかの方が印象を左右しやすいと言われます。',
+      how: ['肩の縫い目が自分の肩の位置にあるか', '袖は手首の骨あたり、パンツの裾は靴に軽くかかる程度', '試着して、店員さんにサイズを相談してよい'],
+      cost: '0円（確認のみ）', time: '買うとき', item: 'size' },
+    { id: 't-shoeclean', area: 'things', level: 2, title: '靴の汚れを落とす', q: '靴が汚れたままになっていない？',
+      why: '足元は意外と見られています。汚れた靴は全体の印象を下げます。',
+      how: ['ブラシか固く絞った布で汚れを落とす', 'スニーカーの白い部分は消しゴムタイプのクリーナーが楽', 'かかとがすり減ったら修理か買い替え'],
+      cost: '数百円〜', time: '2週間に1回・10分', habit: { name: '靴の汚れ落とし', freq: 'irregular', interval: 14 }, item: 'shoe-care' },
+    { id: 't-glasses', area: 'things', level: 2, title: 'メガネを拭く・合ったフレームを選ぶ', q: 'メガネのレンズを毎日きれいにしている？（メガネの人）',
+      why: 'レンズの指紋や汚れは、向かい合うとよく見えます。',
+      how: ['水かメガネ用クリーナーで洗い、専用クロスで拭く', '服で拭かない（傷の原因）', '買うときは店員さんに顔幅に合うか相談'],
+      cost: 'クロス 数百円', time: '毎日・30秒', habit: { name: 'メガネを拭く', freq: 'daily' }, item: 'glasses-care' },
+    { id: 't-kit', area: 'things', level: 2, title: '身だしなみ道具を一式そろえる', q: '爪切り・鼻毛ハサミ・眉ハサミ・コームなど、自分用の道具を持っている？',
+      why: '道具があれば、気づいたときにすぐ整えられます。',
+      how: ['爪切り・やすり', '鼻毛ハサミ（またはトリマー）', '眉ハサミ・眉コーム', 'ポーチ1つにまとめる'],
+      cost: '合計 千〜2千円程度', time: '一度そろえるだけ',
+      sneaky: '通販でまとめて買い、ポーチにまとめて自分の部屋に置いておけば家族の目に入りません。',
+      item: 'small-items' },
+    { id: 't-bag', area: 'things', level: 2, title: '場面に合ったカバンを使う', q: '仕事・休日・冠婚葬祭など、場面に合うカバンを持っている？',
+      why: 'すべての場面を同じリュックで通すと、浮いてしまう場面があります。',
+      how: ['普段用（リュック・トート）', 'きちんとした場面用（無地の黒・紺など）', '中身は月1回整理'],
+      cost: '数千円〜', time: '—', item: 'bag-type' },
+
+    { id: 't-leather', area: 'things', level: 3, title: '革靴を磨く', q: '革靴を持っていて、ときどき磨いている？',
+      why: '必要な場面（式・面接など）は必ず来ます。手入れした革靴は長持ちします。',
+      how: ['ブラシでホコリを落とす', 'クリームを薄く塗る', '布で磨く'],
+      cost: 'ケア用品 千〜2千円', time: '月1回・15分', habit: { name: '革靴を磨く', freq: 'monthly' }, item: 'shoe-shine' },
+    { id: 't-coat', area: 'things', level: 3, title: '季節に合った上着を持つ', q: '季節ごとに、きちんと見える上着を1着持っている？',
+      why: '上着は面積が大きく、印象を決めやすいアイテムです。',
+      how: ['まず無地・落ち着いた色を1着', 'サイズを試着で確認', '季節の終わりにクリーニング'],
+      cost: '数千円〜', time: '季節に1回', item: 'season-clothes' },
+
+    // ===== 振る舞い・常識 =====
+    { id: 'k-staff', area: 'know', level: 1, title: '店員さんに丁寧に接する', q: '店員さんに「ありがとうございます」「お願いします」を言っている？',
+      why: '店員さんへの態度は、一緒にいる人から意外とよく見られています。',
+      how: ['注文時は「〇〇お願いします」', '受け取ったら「ありがとうございます」', 'タメ口・命令口調にしない'],
+      cost: '0円', time: '—', item: 'staff' },
+    { id: 'k-eat', area: 'know', level: 1, title: '口を閉じて食べる', q: '食べるとき、口を閉じて噛んでいる？（音を立てていない？）',
+      why: '口を開けて噛む音（クチャ音）は、自分では気づきにくく、嫌がる人が多いです。',
+      how: ['口に入れたら口を閉じて噛む', '口に物を入れたまま話さない', '一口の量を少なめに'],
+      cost: '0円', time: '—',
+      sneaky: '自分の食べている様子を一度スマホで動画に撮ってみると、客観的に確認できます。',
+      item: 'meal-manner' },
+    { id: 'k-public', area: 'know', level: 1, title: '公共の場で周りに配慮する', q: '電車やお店で、声の大きさ・場所の取り方に気をつけている？',
+      why: '周りへの配慮は、知らない人からもよく見られています。',
+      how: ['電車ではリュックを前か網棚に', '通話・大声を控える', '道や通路の真ん中で立ち止まらない'],
+      cost: '0円', time: '—', item: 'public' },
+
+    { id: 'k-listen', area: 'know', level: 2, title: '自分の話ばかりしない', q: '会話で、相手の話を聞く時間も取れている？',
+      why: '話が上手でなくても、聞いてくれる人は好印象を持たれやすいです。',
+      how: ['相手の話を最後まで聞く（遮らない）', '「それでどうなったの？」と1つ質問する', '自分の話に持っていきすぎない'],
+      cost: '0円', time: '—', item: 'self-talk' },
+    { id: 'k-selfdep', area: 'know', level: 2, title: '自虐しすぎない', q: '自虐を言いすぎて、相手が反応に困っていない？',
+      why: '適度ならよいですが、続くと相手がフォローに困ることがあります。',
+      how: ['褒められたら否定せず「ありがとう」', '自虐は1回の会話で1回くらいまで', '自虐風の自慢にならないよう注意'],
+      cost: '0円', time: '—', item: 'self-deprecation' },
+    { id: 'k-keigo', area: 'know', level: 2, title: '基本の敬語を使える', q: '目上の人・初対面の人に、自然に敬語で話せる？',
+      why: '社会に出ると、敬語ができるかどうかで印象が大きく変わります。',
+      how: ['まずは「です・ます」で話す', '「了解です」より「承知しました」', '名前を呼ぶときは「さん」付け'],
+      cost: '0円', time: '—', item: 'keigo' },
+    { id: 'k-thanks', area: 'know', level: 2, title: 'お礼と謝罪をすぐ言う', q: '何かしてもらったらお礼、迷惑をかけたら謝罪をすぐ伝えている？',
+      why: '小さなことでも、言う・言わないで信頼が変わります。',
+      how: ['その場で一言「ありがとう」「ごめん」', '後からでもLINEで一言送る', '言い訳から入らない'],
+      cost: '0円', time: '—', item: 'thanks-apology' },
+    { id: 'k-label', area: 'know', level: 2, title: '洗濯表示を読める', q: '服のタグの洗濯表示を見て、洗い方を判断できる？',
+      why: '間違った洗い方で、服が縮んだり色落ちしたりします。',
+      how: ['新しい服はまずタグを見る', '「手洗い」「洗濯機不可」「漂白不可」だけでも覚える', '分からなければ消費者庁の資料で確認'],
+      cost: '0円', time: '一度覚えるだけ', item: 'care-label' },
+    { id: 'k-ceremony', area: 'know', level: 2, title: '冠婚葬祭の服装の基本を知る', q: '結婚式とお葬式に、何を着ればいいか分かる？',
+      why: '急に必要になることが多く、そのとき調べても準備が間に合わないことがあります。',
+      how: ['喪服（ブラックフォーマル）は急に必要になるので早めに用意', '結婚式は白い服を避けるのが一般的', '靴・カバン・靴下の色も確認'],
+      cost: '喪服 数万円〜', time: '—', item: 'ceremony' },
+
+    { id: 'k-table', area: 'know', level: 3, title: '基本のテーブルマナーを知る', q: 'フォーク・ナイフの使い方や、箸のマナーの基本が分かる？',
+      why: 'ちゃんとしたお店や会食の場で、落ち着いて食事ができます。',
+      how: ['箸で人を指さない、箸から箸へ渡さない', 'カトラリーは外側から使う', '食べ終わりはナイフとフォークを揃えて置く'],
+      cost: '0円', time: '—', item: 'table-manner' },
+    { id: 'k-gift', area: 'know', level: 3, title: '手土産・お礼の品を選べる', q: '人の家に行くときやお世話になったとき、手土産を用意できる？',
+      why: 'ちょっとした気づかいで、印象がよくなります。',
+      how: ['相手の家族構成に合わせて数を選ぶ', '日持ちするお菓子が無難', '価格の目安は千〜3千円程度'],
+      cost: '千〜3千円', time: '—', item: 'gift' }
+  ]
+};
+
+</script>
+<script>
 /* 大人の身だしなみ・生活力向上アプリ — 本体
  * ビルド不要。データはすべてこの端末の localStorage に保存されます。 */
 (function () {
   'use strict';
 
   const D = window.SAITEIGEN_DATA;
+  const MAP = window.SAITEIGEN_MAP;
   const ARTICLES = (window.SAITEIGEN_CONTENT || []).filter(a => a.status !== 'archived');
   const STORE_KEY = 'saiteigen.v1';
   const $app = document.getElementById('app');
@@ -834,7 +1162,7 @@ window.SAITEIGEN_CONTENT = [
   // ---------- 状態 ----------
   const blank = () => ({
     version: 1, status: {}, checks: {}, focus: {}, suggestion: {},
-    habits: [], belongings: [], wishes: [], statusLog: [], practiceLog: [],
+    habits: [], belongings: [], wishes: [], statusLog: [], practiceLog: [], map: {},
     goal: '', onboarded: false
   });
   let S = load();
@@ -1051,6 +1379,7 @@ window.SAITEIGEN_CONTENT = [
     const due = S.habits.filter(h => h.active !== false && (habitDue(h) || habitDoneToday(h)));
     const maint = S.belongings.filter(maintDue);
     const sugg = suggestions().slice(0, 3);
+    const nextGaps = gaps().filter(c => cardState(c) === 'gap').slice(0, 3);
     const focus = allItems.filter(it => S.focus[it.id] && progress(it) < 1)
       .sort((a, b) => (S.focus[a.id] || 2) - (S.focus[b.id] || 2)).slice(0, 5);
     const total = allItems.reduce((a, it) => a + progress(it), 0) / allItems.length;
@@ -1059,7 +1388,7 @@ window.SAITEIGEN_CONTENT = [
     let html = '<header class="hero"><div class="sub">' + (d.getMonth() + 1) + '月' + d.getDate() + '日（' + wd + '）</div>' +
       '<h1>今日やること</h1>' + (S.goal ? '<p class="goal">🎯 ' + esc(S.goal) + '</p>' : '') + '</header>';
 
-    if (!S.onboarded) {
+    if (false) {
       html += '<div class="card intro"><strong>はじめに</strong>' +
         '<p>このアプリは「何を気にすればいいか」を教えるアプリです。まずは最重要の2カテゴリーで、自分の状態をチェックしてみましょう。</p>' +
         '<div class="actions"><a class="btn primary" href="#/cat/c01">美容・身だしなみ</a><a class="btn" href="#/cat/c02">匂い・清潔感</a></div>' +
@@ -1076,6 +1405,10 @@ window.SAITEIGEN_CONTENT = [
       html += '<div class="empty">今日のタスクはありません。<br>おすすめを「取り組む」にするか、<a href="#/habits">習慣</a>を追加しましょう。</div>';
     }
     html += '</section>';
+
+    html += '<section><h2>次に取り組むこと <a class="more" href="#/map">マップ</a></h2>' + (nextGaps.length
+      ? '<ul class="list">' + nextGaps.map(c => '<li><a class="row" href="#/card/' + c.id + '"><span class="lvtag inline lv' + c.level + '">Lv' + c.level + '</span><div class="grow"><div>' + esc(c.title) + '</div><div class="sub">' + esc(c.time) + '</div></div><span class="chev">›</span></a></li>').join('') + '</ul>'
+      : '<a class="card cta" href="#/' + (visibleCards().some(c => !S.map[c.id]) ? 'diag' : 'map') + '"><strong>' + (visibleCards().some(c => !S.map[c.id]) ? 'マップの診断をする' : 'マップを見る') + '</strong><span class="sub">自分の「抜け」がここに出ます</span></a>') + '</section>';
 
     html += '<section><h2>おすすめ <a class="more" href="#/suggest">すべて</a></h2>' +
       (sugg.length ? sugg.map(suggestCard).join('') : '<div class="empty">今のおすすめはすべて確認済みです。</div>') + '</section>';
@@ -1109,7 +1442,7 @@ window.SAITEIGEN_CONTENT = [
 
   views.learn = function (q) {
     q = (q || '').trim();
-    let html = header('学ぶ') + seg([['#/learn', 'カテゴリー'], ['#/articles', '記事']], '#/learn') +
+    let html = header('学ぶ', '#/map') + seg([['#/learn', 'カテゴリー'], ['#/articles', '記事']], '#/learn') +
       '<form class="search" data-search><input type="search" name="q" placeholder="項目を検索（例：眉毛、口臭、洗濯）" value="' + esc(q) + '"></form>';
     if (q) {
       const hits = allItems.filter(it => (it.name + (it.viewpoint || '')).includes(q));
@@ -1129,7 +1462,7 @@ window.SAITEIGEN_CONTENT = [
   };
 
   views.articles = function () {
-    return header('学ぶ') + seg([['#/learn', 'カテゴリー'], ['#/articles', '記事']], '#/articles') +
+    return header('学ぶ', '#/map') + seg([['#/learn', 'カテゴリー'], ['#/articles', '記事']], '#/articles') +
       '<p class="lead">記事には出典・最終確認日・更新履歴が付きます。「下書き・出典確認前」の記事は、内容がまだ確認されていません。</p>' +
       '<ul class="list">' + ARTICLES.map(a => '<li><a class="row" href="#/article/' + a.id + '"><span class="ico">📖</span><div class="grow"><div>' + esc(a.title) + '</div>' +
         '<div class="sub">' + articleBadge(a) + ' ' + esc(D.reliabilityTypes[a.reliability] || '') + '</div></div><span class="chev">›</span></a></li>').join('') + '</ul>';
@@ -1365,6 +1698,159 @@ window.SAITEIGEN_CONTENT = [
 
   function notFound() { return header('見つかりません', '#/home') + '<div class="empty">ページが見つかりませんでした。</div>'; }
 
+
+  // ---------- さいていげんマップ ----------
+  const cardMap = {};
+  MAP.cards.forEach(c => { cardMap[c.id] = c; });
+  const areaMap = {};
+  MAP.areas.forEach(a => { areaMap[a.id] = a; });
+  const lvName = l => MAP.levels[l - 1].name;
+  const visibleCards = () => MAP.cards.filter(c => !c.for || c.for === 'all' || c.for === S.gender);
+  // 状態: ok=できてる / doing=取り組み中 / gap=まだ / skip=自分には不要 / undefined=未確認
+  function cardState(c) {
+    const st = S.map[c.id];
+    if (st === 'gap' && c.habit && S.habits.some(h => h.mapId === c.id && h.active !== false)) return 'doing';
+    return st;
+  }
+  const STATE_UI = {
+    ok: ['✓', 'できてる', 'st-ok'], doing: ['▶', '取り組み中', 'st-doing'], gap: ['!', 'まだ', 'st-gap'],
+    skip: ['–', '自分には不要', 'st-skip'], undefined: ['?', '未確認', 'st-none']
+  };
+  function setCard(id, st) {
+    const c = cardMap[id];
+    S.map[id] = st;
+    if (c.item && itemMap[c.item]) {
+      if (st === 'ok') raiseStatus(c.item, 4);
+      else if (st === 'gap') raiseStatus(c.item, 1);
+    }
+    save();
+  }
+  function addCardHabit(c) {
+    if (!c.habit) return false;
+    const exists = S.habits.find(h => h.mapId === c.id && h.active !== false);
+    if (exists) return false;
+    S.habits.push({ id: uid(), name: c.habit.name, freq: c.habit.freq, interval: c.habit.interval || D.freqDays[c.habit.freq],
+      itemId: c.item || null, mapId: c.id, last: null, log: [], createdAt: today(), active: true });
+    if (S.map[c.id] !== 'ok') S.map[c.id] = 'gap';
+    save();
+    return true;
+  }
+  function gaps() {
+    return visibleCards().filter(c => S.map[c.id] === 'gap').sort((a, b) => a.level - b.level);
+  }
+  function levelStats(level, area) {
+    const cs = visibleCards().filter(c => c.level === level && (!area || c.area === area) && S.map[c.id] !== 'skip');
+    return { ok: cs.filter(c => S.map[c.id] === 'ok').length, total: cs.length };
+  }
+  function tile(c) {
+    const [mark, label, cls] = STATE_UI[cardState(c)];
+    return '<a class="mtile ' + cls + '" href="#/card/' + c.id + '"><span class="mark" aria-label="' + label + '">' + mark + '</span>' +
+      '<span class="mt">' + esc(c.title) + '</span></a>';
+  }
+
+  views.map = function (area) {
+    const areas = area && areaMap[area] ? [areaMap[area]] : MAP.areas;
+    const answered = visibleCards().filter(c => S.map[c.id]).length;
+    const all = visibleCards().length;
+    let html = '<header class="hero"><div class="sub">普通の人が、こっそりやっていること</div><h1>さいていげんマップ</h1></header>';
+    if (answered < all) {
+      html += '<a class="card cta" href="#/diag"><strong>' + (answered ? '診断のつづき（' + answered + '/' + all + '）' : 'まず診断してみる（約' + Math.ceil(all / 10) + '分）') + '</strong>' +
+        '<span class="sub">はい／いいえで答えるだけで、自分の「抜け」がマップに出ます。答えはこの端末にしか残りません。</span></a>';
+    }
+    html += '<div class="lvsum">' + MAP.levels.map(l => {
+      const st = levelStats(l.level, area);
+      return '<div class="lv lv' + l.level + '"><div class="lvname">Lv' + l.level + ' ' + esc(l.name) + '</div>' +
+        '<div class="lvnum">' + st.ok + '<small>/' + st.total + '</small></div>' + bar(st.total ? st.ok / st.total : 0) + '</div>';
+    }).join('') + '</div>';
+    html += seg([['#/map', 'すべて']].concat(MAP.areas.map(a => ['#/map?a=' + a.id, a.name])), area ? '#/map?a=' + area : '#/map');
+    html += '<div class="legend">' + ['ok', 'doing', 'gap', 'skip', 'undefined'].map(k =>
+      '<span class="' + STATE_UI[k][2] + '"><span class="mark">' + STATE_UI[k][0] + '</span>' + STATE_UI[k][1] + '</span>').join('') + '</div>';
+    areas.forEach(a => {
+      html += '<section class="area"><h2>' + a.icon + ' ' + esc(a.name) + '</h2>';
+      MAP.levels.forEach(l => {
+        const cs = visibleCards().filter(c => c.area === a.id && c.level === l.level);
+        if (!cs.length) return;
+        html += '<div class="lvrow"><div class="lvtag lv' + l.level + '">Lv' + l.level + '<br><small>' + esc(l.name) + '</small></div>' +
+          '<div class="mtiles">' + cs.map(tile).join('') + '</div></div>';
+      });
+      html += '</section>';
+    });
+    html += '<p class="sub center" style="margin-top:20px">内容は編集中の下書きです。健康・安全に関わることは、製品の表示や専門家の情報を優先してください。</p>' +
+      '<ul class="list" style="margin-top:12px"><li><a class="row" href="#/learn"><span class="ico">📚</span><div class="grow">もっと細かい項目一覧（13カテゴリー）</div><span class="chev">›</span></a></li></ul>';
+    return html;
+  };
+
+  views.card = function (id) {
+    const c = cardMap[id];
+    if (!c) return notFound();
+    const a = areaMap[c.area];
+    const st = cardState(c);
+    const hasHabit = S.habits.some(h => h.mapId === c.id && h.active !== false);
+    const btn = (k, label) => '<button class="btn ' + (S.map[c.id] === k ? 'primary' : '') + '" data-act="card-state" data-id="' + c.id + '" data-v="' + k + '">' + label + '</button>';
+    let html = header(a.icon + ' ' + a.name, '#/map?a=' + c.area) +
+      '<div class="cardhead"><span class="lvtag inline lv' + c.level + '">Lv' + c.level + ' ' + esc(lvName(c.level)) + '</span>' +
+      '<span class="badge ' + STATE_UI[st][2] + '">' + STATE_UI[st][1] + '</span></div>' +
+      '<h1 class="ctitle">' + esc(c.title) + '</h1>' +
+      '<div class="card"><div class="sub">なぜ？</div><p>' + esc(c.why) + '</p></div>' +
+      '<div class="card"><div class="sub">やり方</div><ol class="how">' + c.how.map(h => '<li>' + esc(h) + '</li>').join('') + '</ol>' +
+      '<dl class="meta"><div><dt>費用</dt><dd>' + esc(c.cost) + '</dd></div><div><dt>時間・頻度</dt><dd>' + esc(c.time) + '</dd></div></dl></div>';
+    if (c.sneaky) html += '<div class="card sneaky"><div class="sub">🤫 こっそり始めるコツ</div><p>' + esc(c.sneaky) + '</p></div>';
+    html += '<section><h2>自分は？</h2><p class="sub" style="margin:0 0 8px">' + esc(c.q) + '</p><div class="actions wrap">' +
+      btn('ok', '✓ できてる') + btn('gap', 'まだ') + btn('skip', '自分には不要') + '</div></section>';
+    if (c.habit) {
+      html += '<section><h2>続ける</h2>' + (hasHabit
+        ? '<div class="card"><strong>「' + esc(c.habit.name) + '」を習慣に登録済み</strong><p class="sub">今日のタスクに出てきます。 <a href="#/habits">習慣を見る</a></p></div>'
+        : '<button class="btn primary full" data-act="card-habit" data-id="' + c.id + '">＋「' + esc(c.habit.name) + '」を習慣にする（' + D.freqLabels[c.habit.freq] + '）</button>') + '</section>';
+    }
+    if (c.item && itemMap[c.item]) {
+      html += '<ul class="list" style="margin-top:22px"><li><a class="row" href="#/item/' + c.item + '"><span class="ico">📖</span><div class="grow"><div>もっと詳しく</div><div class="sub">' + esc(itemMap[c.item].name) + '</div></div><span class="chev">›</span></a></li></ul>';
+    }
+    // 前後のカード
+    const list = visibleCards().filter(x => x.area === c.area);
+    const i = list.indexOf(c);
+    html += '<div class="pager">' + (i > 0 ? '<a href="#/card/' + list[i - 1].id + '">‹ ' + esc(list[i - 1].title) + '</a>' : '<span></span>') +
+      (i < list.length - 1 ? '<a href="#/card/' + list[i + 1].id + '">' + esc(list[i + 1].title) + ' ›</a>' : '<span></span>') + '</div>';
+    return html;
+  };
+
+  views.diag = function () {
+    const cards = visibleCards().slice().sort((a, b) => a.level - b.level || MAP.areas.indexOf(areaMap[a.area]) - MAP.areas.indexOf(areaMap[b.area]));
+    const next = cards.find(c => !S.map[c.id]);
+    const done = cards.filter(c => S.map[c.id]).length;
+    let html = header('診断', '#/map') + bar(done / cards.length) + '<div class="sub center">' + done + ' / ' + cards.length + '</div>';
+    if (next) {
+      const a = areaMap[next.area];
+      html += '<div class="card diag"><div class="sub">' + a.icon + ' ' + esc(a.name) + ' · Lv' + next.level + ' ' + esc(lvName(next.level)) + '</div>' +
+        '<p class="q">' + esc(next.q) + '</p>' +
+        '<div class="diag-btns"><button class="btn primary" data-act="diag" data-id="' + next.id + '" data-v="ok">はい</button>' +
+        '<button class="btn" data-act="diag" data-id="' + next.id + '" data-v="gap">いいえ・分からない</button>' +
+        '<button class="btn ghost" data-act="diag" data-id="' + next.id + '" data-v="skip">自分には関係ない</button></div></div>' +
+        '<p class="sub center">正直に答えて大丈夫です。答えはこのiPhoneの中にだけ保存されます。</p>' +
+        (done ? '<div class="actions" style="justify-content:center"><button class="link small" data-act="diag-back">ひとつ戻る</button>　<a class="link small" href="#/diag-result">ここまでの結果を見る</a></div>' : '');
+    } else {
+      location.replace('#/diag-result');
+    }
+    return html;
+  };
+
+  views['diag-result'] = function () {
+    const g = gaps();
+    const ok = visibleCards().filter(c => S.map[c.id] === 'ok').length;
+    let html = header('診断結果', '#/map') +
+      '<div class="card"><strong>できていること ' + ok + '個 ／ これから ' + g.length + '個</strong>' +
+      '<p class="sub">全部いっぺんにやる必要はありません。Lv1 から1つずつ始めましょう。</p></div>';
+    MAP.levels.forEach(l => {
+      const cs = g.filter(c => c.level === l.level);
+      if (!cs.length) return;
+      html += '<section><h2><span class="lvtag inline lv' + l.level + '">Lv' + l.level + ' ' + esc(l.name) + '</span> ' + cs.length + '個</h2><ul class="list">' +
+        cs.map(c => '<li><a class="row" href="#/card/' + c.id + '"><span class="ico">' + areaMap[c.area].icon + '</span><div class="grow"><div>' + esc(c.title) + '</div><div class="sub">' + esc(c.cost) + ' · ' + esc(c.time) + '</div></div><span class="chev">›</span></a></li>').join('') +
+        '</ul></section>';
+    });
+    if (!g.length) html += '<div class="empty">「まだ」の項目はありません。すばらしい！</div>';
+    html += '<div class="actions"><a class="btn primary" href="#/map">マップを見る</a><button class="btn ghost" data-act="diag-reset">診断をやり直す</button></div>';
+    return html;
+  };
+
   // ---------- フォーム ----------
   function field(label, name, value, type, extra) {
     return '<label class="field"><span>' + esc(label) + '</span><input name="' + name + '" type="' + (type || 'text') + '" value="' + esc(value == null ? '' : value) + '" ' + (extra || '') + '></label>';
@@ -1506,6 +1992,11 @@ window.SAITEIGEN_CONTENT = [
     const W = () => S.wishes.find(w => w.id === id);
     switch (act) {
       case 'close-sheet': closeSheet(); return;
+      case 'card-state': setCard(id, el.dataset.v); toast(STATE_UI[el.dataset.v][1] + ' にしました'); render(); return;
+      case 'card-habit': if (addCardHabit(cardMap[id])) toast('習慣に追加しました。今日のタスクに出ます'); render(); return;
+      case 'diag': setCard(id, el.dataset.v); S.diagHist = (S.diagHist || []).concat(id).slice(-100); save(); render(); return;
+      case 'diag-back': { const last = (S.diagHist || []).pop(); if (last) delete S.map[last]; save(); render(); return; }
+      case 'diag-reset': if (confirm('診断の答えをすべて消してやり直しますか？')) { S.map = {}; S.diagHist = []; save(); location.hash = '#/diag'; } return;
       case 'onboarded': S.onboarded = true; break;
       case 'status': setStatus(id, Number(el.dataset.v)); S.onboarded = true; break;
       case 'check': {
@@ -1590,15 +2081,15 @@ window.SAITEIGEN_CONTENT = [
   // ---------- ルーター ----------
   let lastRoute = '';
   function render() {
-    const hash = location.hash || '#/home';
+    const hash = location.hash || '#/map';
     const [path, query] = hash.slice(2).split('?');
     const [name, arg] = path.split('/');
     const params = new URLSearchParams(query || '');
-    const fn = views[name] || views.home;
+    const fn = views[name] || views.map;
     const y = window.scrollY;
-    $app.innerHTML = fn(name === 'learn' ? params.get('q') : arg);
-    const tab = { home: 'home', suggest: 'home', learn: 'learn', articles: 'learn', cat: 'learn', item: 'learn', article: 'learn',
-      habits: 'habits', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'home';
+    $app.innerHTML = fn(name === 'learn' ? params.get('q') : name === 'map' ? params.get('a') : arg);
+    const tab = { map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
+      habits: 'habits', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'map';
     document.querySelectorAll('.tabbar a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
     if (hash !== lastRoute) window.scrollTo(0, 0); else window.scrollTo(0, y);
     lastRoute = hash;

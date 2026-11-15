@@ -4,6 +4,7 @@
   'use strict';
 
   const D = window.SAITEIGEN_DATA;
+  const MAP = window.SAITEIGEN_MAP;
   const ARTICLES = (window.SAITEIGEN_CONTENT || []).filter(a => a.status !== 'archived');
   const STORE_KEY = 'saiteigen.v1';
   const $app = document.getElementById('app');
@@ -26,7 +27,7 @@
   // ---------- 状態 ----------
   const blank = () => ({
     version: 1, status: {}, checks: {}, focus: {}, suggestion: {},
-    habits: [], belongings: [], wishes: [], statusLog: [], practiceLog: [],
+    habits: [], belongings: [], wishes: [], statusLog: [], practiceLog: [], map: {},
     goal: '', onboarded: false
   });
   let S = load();
@@ -243,6 +244,7 @@
     const due = S.habits.filter(h => h.active !== false && (habitDue(h) || habitDoneToday(h)));
     const maint = S.belongings.filter(maintDue);
     const sugg = suggestions().slice(0, 3);
+    const nextGaps = gaps().filter(c => cardState(c) === 'gap').slice(0, 3);
     const focus = allItems.filter(it => S.focus[it.id] && progress(it) < 1)
       .sort((a, b) => (S.focus[a.id] || 2) - (S.focus[b.id] || 2)).slice(0, 5);
     const total = allItems.reduce((a, it) => a + progress(it), 0) / allItems.length;
@@ -251,7 +253,7 @@
     let html = '<header class="hero"><div class="sub">' + (d.getMonth() + 1) + '月' + d.getDate() + '日（' + wd + '）</div>' +
       '<h1>今日やること</h1>' + (S.goal ? '<p class="goal">🎯 ' + esc(S.goal) + '</p>' : '') + '</header>';
 
-    if (!S.onboarded) {
+    if (false) {
       html += '<div class="card intro"><strong>はじめに</strong>' +
         '<p>このアプリは「何を気にすればいいか」を教えるアプリです。まずは最重要の2カテゴリーで、自分の状態をチェックしてみましょう。</p>' +
         '<div class="actions"><a class="btn primary" href="#/cat/c01">美容・身だしなみ</a><a class="btn" href="#/cat/c02">匂い・清潔感</a></div>' +
@@ -268,6 +270,10 @@
       html += '<div class="empty">今日のタスクはありません。<br>おすすめを「取り組む」にするか、<a href="#/habits">習慣</a>を追加しましょう。</div>';
     }
     html += '</section>';
+
+    html += '<section><h2>次に取り組むこと <a class="more" href="#/map">マップ</a></h2>' + (nextGaps.length
+      ? '<ul class="list">' + nextGaps.map(c => '<li><a class="row" href="#/card/' + c.id + '"><span class="lvtag inline lv' + c.level + '">Lv' + c.level + '</span><div class="grow"><div>' + esc(c.title) + '</div><div class="sub">' + esc(c.time) + '</div></div><span class="chev">›</span></a></li>').join('') + '</ul>'
+      : '<a class="card cta" href="#/' + (visibleCards().some(c => !S.map[c.id]) ? 'diag' : 'map') + '"><strong>' + (visibleCards().some(c => !S.map[c.id]) ? 'マップの診断をする' : 'マップを見る') + '</strong><span class="sub">自分の「抜け」がここに出ます</span></a>') + '</section>';
 
     html += '<section><h2>おすすめ <a class="more" href="#/suggest">すべて</a></h2>' +
       (sugg.length ? sugg.map(suggestCard).join('') : '<div class="empty">今のおすすめはすべて確認済みです。</div>') + '</section>';
@@ -301,7 +307,7 @@
 
   views.learn = function (q) {
     q = (q || '').trim();
-    let html = header('学ぶ') + seg([['#/learn', 'カテゴリー'], ['#/articles', '記事']], '#/learn') +
+    let html = header('学ぶ', '#/map') + seg([['#/learn', 'カテゴリー'], ['#/articles', '記事']], '#/learn') +
       '<form class="search" data-search><input type="search" name="q" placeholder="項目を検索（例：眉毛、口臭、洗濯）" value="' + esc(q) + '"></form>';
     if (q) {
       const hits = allItems.filter(it => (it.name + (it.viewpoint || '')).includes(q));
@@ -321,7 +327,7 @@
   };
 
   views.articles = function () {
-    return header('学ぶ') + seg([['#/learn', 'カテゴリー'], ['#/articles', '記事']], '#/articles') +
+    return header('学ぶ', '#/map') + seg([['#/learn', 'カテゴリー'], ['#/articles', '記事']], '#/articles') +
       '<p class="lead">記事には出典・最終確認日・更新履歴が付きます。「下書き・出典確認前」の記事は、内容がまだ確認されていません。</p>' +
       '<ul class="list">' + ARTICLES.map(a => '<li><a class="row" href="#/article/' + a.id + '"><span class="ico">📖</span><div class="grow"><div>' + esc(a.title) + '</div>' +
         '<div class="sub">' + articleBadge(a) + ' ' + esc(D.reliabilityTypes[a.reliability] || '') + '</div></div><span class="chev">›</span></a></li>').join('') + '</ul>';
@@ -557,6 +563,159 @@
 
   function notFound() { return header('見つかりません', '#/home') + '<div class="empty">ページが見つかりませんでした。</div>'; }
 
+
+  // ---------- さいていげんマップ ----------
+  const cardMap = {};
+  MAP.cards.forEach(c => { cardMap[c.id] = c; });
+  const areaMap = {};
+  MAP.areas.forEach(a => { areaMap[a.id] = a; });
+  const lvName = l => MAP.levels[l - 1].name;
+  const visibleCards = () => MAP.cards.filter(c => !c.for || c.for === 'all' || c.for === S.gender);
+  // 状態: ok=できてる / doing=取り組み中 / gap=まだ / skip=自分には不要 / undefined=未確認
+  function cardState(c) {
+    const st = S.map[c.id];
+    if (st === 'gap' && c.habit && S.habits.some(h => h.mapId === c.id && h.active !== false)) return 'doing';
+    return st;
+  }
+  const STATE_UI = {
+    ok: ['✓', 'できてる', 'st-ok'], doing: ['▶', '取り組み中', 'st-doing'], gap: ['!', 'まだ', 'st-gap'],
+    skip: ['–', '自分には不要', 'st-skip'], undefined: ['?', '未確認', 'st-none']
+  };
+  function setCard(id, st) {
+    const c = cardMap[id];
+    S.map[id] = st;
+    if (c.item && itemMap[c.item]) {
+      if (st === 'ok') raiseStatus(c.item, 4);
+      else if (st === 'gap') raiseStatus(c.item, 1);
+    }
+    save();
+  }
+  function addCardHabit(c) {
+    if (!c.habit) return false;
+    const exists = S.habits.find(h => h.mapId === c.id && h.active !== false);
+    if (exists) return false;
+    S.habits.push({ id: uid(), name: c.habit.name, freq: c.habit.freq, interval: c.habit.interval || D.freqDays[c.habit.freq],
+      itemId: c.item || null, mapId: c.id, last: null, log: [], createdAt: today(), active: true });
+    if (S.map[c.id] !== 'ok') S.map[c.id] = 'gap';
+    save();
+    return true;
+  }
+  function gaps() {
+    return visibleCards().filter(c => S.map[c.id] === 'gap').sort((a, b) => a.level - b.level);
+  }
+  function levelStats(level, area) {
+    const cs = visibleCards().filter(c => c.level === level && (!area || c.area === area) && S.map[c.id] !== 'skip');
+    return { ok: cs.filter(c => S.map[c.id] === 'ok').length, total: cs.length };
+  }
+  function tile(c) {
+    const [mark, label, cls] = STATE_UI[cardState(c)];
+    return '<a class="mtile ' + cls + '" href="#/card/' + c.id + '"><span class="mark" aria-label="' + label + '">' + mark + '</span>' +
+      '<span class="mt">' + esc(c.title) + '</span></a>';
+  }
+
+  views.map = function (area) {
+    const areas = area && areaMap[area] ? [areaMap[area]] : MAP.areas;
+    const answered = visibleCards().filter(c => S.map[c.id]).length;
+    const all = visibleCards().length;
+    let html = '<header class="hero"><div class="sub">普通の人が、こっそりやっていること</div><h1>さいていげんマップ</h1></header>';
+    if (answered < all) {
+      html += '<a class="card cta" href="#/diag"><strong>' + (answered ? '診断のつづき（' + answered + '/' + all + '）' : 'まず診断してみる（約' + Math.ceil(all / 10) + '分）') + '</strong>' +
+        '<span class="sub">はい／いいえで答えるだけで、自分の「抜け」がマップに出ます。答えはこの端末にしか残りません。</span></a>';
+    }
+    html += '<div class="lvsum">' + MAP.levels.map(l => {
+      const st = levelStats(l.level, area);
+      return '<div class="lv lv' + l.level + '"><div class="lvname">Lv' + l.level + ' ' + esc(l.name) + '</div>' +
+        '<div class="lvnum">' + st.ok + '<small>/' + st.total + '</small></div>' + bar(st.total ? st.ok / st.total : 0) + '</div>';
+    }).join('') + '</div>';
+    html += seg([['#/map', 'すべて']].concat(MAP.areas.map(a => ['#/map?a=' + a.id, a.name])), area ? '#/map?a=' + area : '#/map');
+    html += '<div class="legend">' + ['ok', 'doing', 'gap', 'skip', 'undefined'].map(k =>
+      '<span class="' + STATE_UI[k][2] + '"><span class="mark">' + STATE_UI[k][0] + '</span>' + STATE_UI[k][1] + '</span>').join('') + '</div>';
+    areas.forEach(a => {
+      html += '<section class="area"><h2>' + a.icon + ' ' + esc(a.name) + '</h2>';
+      MAP.levels.forEach(l => {
+        const cs = visibleCards().filter(c => c.area === a.id && c.level === l.level);
+        if (!cs.length) return;
+        html += '<div class="lvrow"><div class="lvtag lv' + l.level + '">Lv' + l.level + '<br><small>' + esc(l.name) + '</small></div>' +
+          '<div class="mtiles">' + cs.map(tile).join('') + '</div></div>';
+      });
+      html += '</section>';
+    });
+    html += '<p class="sub center" style="margin-top:20px">内容は編集中の下書きです。健康・安全に関わることは、製品の表示や専門家の情報を優先してください。</p>' +
+      '<ul class="list" style="margin-top:12px"><li><a class="row" href="#/learn"><span class="ico">📚</span><div class="grow">もっと細かい項目一覧（13カテゴリー）</div><span class="chev">›</span></a></li></ul>';
+    return html;
+  };
+
+  views.card = function (id) {
+    const c = cardMap[id];
+    if (!c) return notFound();
+    const a = areaMap[c.area];
+    const st = cardState(c);
+    const hasHabit = S.habits.some(h => h.mapId === c.id && h.active !== false);
+    const btn = (k, label) => '<button class="btn ' + (S.map[c.id] === k ? 'primary' : '') + '" data-act="card-state" data-id="' + c.id + '" data-v="' + k + '">' + label + '</button>';
+    let html = header(a.icon + ' ' + a.name, '#/map?a=' + c.area) +
+      '<div class="cardhead"><span class="lvtag inline lv' + c.level + '">Lv' + c.level + ' ' + esc(lvName(c.level)) + '</span>' +
+      '<span class="badge ' + STATE_UI[st][2] + '">' + STATE_UI[st][1] + '</span></div>' +
+      '<h1 class="ctitle">' + esc(c.title) + '</h1>' +
+      '<div class="card"><div class="sub">なぜ？</div><p>' + esc(c.why) + '</p></div>' +
+      '<div class="card"><div class="sub">やり方</div><ol class="how">' + c.how.map(h => '<li>' + esc(h) + '</li>').join('') + '</ol>' +
+      '<dl class="meta"><div><dt>費用</dt><dd>' + esc(c.cost) + '</dd></div><div><dt>時間・頻度</dt><dd>' + esc(c.time) + '</dd></div></dl></div>';
+    if (c.sneaky) html += '<div class="card sneaky"><div class="sub">🤫 こっそり始めるコツ</div><p>' + esc(c.sneaky) + '</p></div>';
+    html += '<section><h2>自分は？</h2><p class="sub" style="margin:0 0 8px">' + esc(c.q) + '</p><div class="actions wrap">' +
+      btn('ok', '✓ できてる') + btn('gap', 'まだ') + btn('skip', '自分には不要') + '</div></section>';
+    if (c.habit) {
+      html += '<section><h2>続ける</h2>' + (hasHabit
+        ? '<div class="card"><strong>「' + esc(c.habit.name) + '」を習慣に登録済み</strong><p class="sub">今日のタスクに出てきます。 <a href="#/habits">習慣を見る</a></p></div>'
+        : '<button class="btn primary full" data-act="card-habit" data-id="' + c.id + '">＋「' + esc(c.habit.name) + '」を習慣にする（' + D.freqLabels[c.habit.freq] + '）</button>') + '</section>';
+    }
+    if (c.item && itemMap[c.item]) {
+      html += '<ul class="list" style="margin-top:22px"><li><a class="row" href="#/item/' + c.item + '"><span class="ico">📖</span><div class="grow"><div>もっと詳しく</div><div class="sub">' + esc(itemMap[c.item].name) + '</div></div><span class="chev">›</span></a></li></ul>';
+    }
+    // 前後のカード
+    const list = visibleCards().filter(x => x.area === c.area);
+    const i = list.indexOf(c);
+    html += '<div class="pager">' + (i > 0 ? '<a href="#/card/' + list[i - 1].id + '">‹ ' + esc(list[i - 1].title) + '</a>' : '<span></span>') +
+      (i < list.length - 1 ? '<a href="#/card/' + list[i + 1].id + '">' + esc(list[i + 1].title) + ' ›</a>' : '<span></span>') + '</div>';
+    return html;
+  };
+
+  views.diag = function () {
+    const cards = visibleCards().slice().sort((a, b) => a.level - b.level || MAP.areas.indexOf(areaMap[a.area]) - MAP.areas.indexOf(areaMap[b.area]));
+    const next = cards.find(c => !S.map[c.id]);
+    const done = cards.filter(c => S.map[c.id]).length;
+    let html = header('診断', '#/map') + bar(done / cards.length) + '<div class="sub center">' + done + ' / ' + cards.length + '</div>';
+    if (next) {
+      const a = areaMap[next.area];
+      html += '<div class="card diag"><div class="sub">' + a.icon + ' ' + esc(a.name) + ' · Lv' + next.level + ' ' + esc(lvName(next.level)) + '</div>' +
+        '<p class="q">' + esc(next.q) + '</p>' +
+        '<div class="diag-btns"><button class="btn primary" data-act="diag" data-id="' + next.id + '" data-v="ok">はい</button>' +
+        '<button class="btn" data-act="diag" data-id="' + next.id + '" data-v="gap">いいえ・分からない</button>' +
+        '<button class="btn ghost" data-act="diag" data-id="' + next.id + '" data-v="skip">自分には関係ない</button></div></div>' +
+        '<p class="sub center">正直に答えて大丈夫です。答えはこのiPhoneの中にだけ保存されます。</p>' +
+        (done ? '<div class="actions" style="justify-content:center"><button class="link small" data-act="diag-back">ひとつ戻る</button>　<a class="link small" href="#/diag-result">ここまでの結果を見る</a></div>' : '');
+    } else {
+      location.replace('#/diag-result');
+    }
+    return html;
+  };
+
+  views['diag-result'] = function () {
+    const g = gaps();
+    const ok = visibleCards().filter(c => S.map[c.id] === 'ok').length;
+    let html = header('診断結果', '#/map') +
+      '<div class="card"><strong>できていること ' + ok + '個 ／ これから ' + g.length + '個</strong>' +
+      '<p class="sub">全部いっぺんにやる必要はありません。Lv1 から1つずつ始めましょう。</p></div>';
+    MAP.levels.forEach(l => {
+      const cs = g.filter(c => c.level === l.level);
+      if (!cs.length) return;
+      html += '<section><h2><span class="lvtag inline lv' + l.level + '">Lv' + l.level + ' ' + esc(l.name) + '</span> ' + cs.length + '個</h2><ul class="list">' +
+        cs.map(c => '<li><a class="row" href="#/card/' + c.id + '"><span class="ico">' + areaMap[c.area].icon + '</span><div class="grow"><div>' + esc(c.title) + '</div><div class="sub">' + esc(c.cost) + ' · ' + esc(c.time) + '</div></div><span class="chev">›</span></a></li>').join('') +
+        '</ul></section>';
+    });
+    if (!g.length) html += '<div class="empty">「まだ」の項目はありません。すばらしい！</div>';
+    html += '<div class="actions"><a class="btn primary" href="#/map">マップを見る</a><button class="btn ghost" data-act="diag-reset">診断をやり直す</button></div>';
+    return html;
+  };
+
   // ---------- フォーム ----------
   function field(label, name, value, type, extra) {
     return '<label class="field"><span>' + esc(label) + '</span><input name="' + name + '" type="' + (type || 'text') + '" value="' + esc(value == null ? '' : value) + '" ' + (extra || '') + '></label>';
@@ -698,6 +857,11 @@
     const W = () => S.wishes.find(w => w.id === id);
     switch (act) {
       case 'close-sheet': closeSheet(); return;
+      case 'card-state': setCard(id, el.dataset.v); toast(STATE_UI[el.dataset.v][1] + ' にしました'); render(); return;
+      case 'card-habit': if (addCardHabit(cardMap[id])) toast('習慣に追加しました。今日のタスクに出ます'); render(); return;
+      case 'diag': setCard(id, el.dataset.v); S.diagHist = (S.diagHist || []).concat(id).slice(-100); save(); render(); return;
+      case 'diag-back': { const last = (S.diagHist || []).pop(); if (last) delete S.map[last]; save(); render(); return; }
+      case 'diag-reset': if (confirm('診断の答えをすべて消してやり直しますか？')) { S.map = {}; S.diagHist = []; save(); location.hash = '#/diag'; } return;
       case 'onboarded': S.onboarded = true; break;
       case 'status': setStatus(id, Number(el.dataset.v)); S.onboarded = true; break;
       case 'check': {
@@ -782,15 +946,15 @@
   // ---------- ルーター ----------
   let lastRoute = '';
   function render() {
-    const hash = location.hash || '#/home';
+    const hash = location.hash || '#/map';
     const [path, query] = hash.slice(2).split('?');
     const [name, arg] = path.split('/');
     const params = new URLSearchParams(query || '');
-    const fn = views[name] || views.home;
+    const fn = views[name] || views.map;
     const y = window.scrollY;
-    $app.innerHTML = fn(name === 'learn' ? params.get('q') : arg);
-    const tab = { home: 'home', suggest: 'home', learn: 'learn', articles: 'learn', cat: 'learn', item: 'learn', article: 'learn',
-      habits: 'habits', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'home';
+    $app.innerHTML = fn(name === 'learn' ? params.get('q') : name === 'map' ? params.get('a') : arg);
+    const tab = { map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
+      habits: 'habits', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'map';
     document.querySelectorAll('.tabbar a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
     if (hash !== lastRoute) window.scrollTo(0, 0); else window.scrollTo(0, y);
     lastRoute = hash;
