@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>さいていげん</title>
+<meta name="description" content="大人の身だしなみ・生活力向上アプリ">
+<meta name="theme-color" content="#f6f5f2" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="さいていげん">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<main id="app" aria-live="polite"></main>
+<nav class="tabbar" aria-label="メイン">
+  <a href="#/home" data-tab="home"><span>🏠</span>ホーム</a>
+  <a href="#/learn" data-tab="learn"><span>📚</span>学ぶ</a>
+  <a href="#/habits" data-tab="habits"><span>🔁</span>習慣</a>
+  <a href="#/belongings" data-tab="own"><span>🎒</span>持ち物</a>
+  <a href="#/my" data-tab="my"><span>👤</span>マイ</a>
+</nav>
+<div id="sheet" class="sheet"></div>
+<div id="toast" class="toast" role="status"></div>
+<script>window.SAITEIGEN_VERSION = '0.1.0';</script>
+<script src="js/data.js"></script>
+<script src="js/content.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>
