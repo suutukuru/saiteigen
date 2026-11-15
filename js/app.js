@@ -804,6 +804,10 @@
     if (!document.hidden && today() !== renderedDay) { renderedDay = today(); render(); }
   });
 
+  // 保存できない環境（ファイルから開いた場合など）では最初に知らせる
+  try { localStorage.setItem('saiteigen.test', '1'); localStorage.removeItem('saiteigen.test'); }
+  catch (e) { setTimeout(() => toast('この開き方では記録を保存できません。Safariで開くか、バックアップを使ってください。'), 600); }
+
   // ---------- オフライン対応 ----------
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     navigator.serviceWorker.register('sw.js').catch(e => console.warn('SW', e));
