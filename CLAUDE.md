@@ -24,6 +24,7 @@
   - AIが新しく書く文章は、必ず AI仮情報として扱う（ai-draft に置く／`origin: 'ai'` を付ける）。確認済み扱いにしない。
   - 人が確認した内容は `js/content.js` に `origin: 'human'` で入れる（ai-draft より優先される）。カードは `origin: 'verified'`。
   - 残数の確認：`node tools/ai-report.js`
+- **「うわっと思われがち」**（ワックス・香水のつけすぎ等）：`js/map.js` の各カードの `ng` 配列に追加する。カード画面・項目画面・一覧 `#/ng` に自動で出る。人格や外見の断定は書かず「こう見られがち」という行動の例で書く。
 
 ## 確認方法
 - `python3 -m http.server 8765` で起動し、Playwright（iPhoneサイズ）で動作確認する。

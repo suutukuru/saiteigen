@@ -412,6 +412,8 @@
         : suggestCard({ it, sg })) + '</section>';
     }
 
+    const ngCards = MAP.cards.filter(c => c.item === id && c.ng && c.ng.length);
+    if (ngCards.length) html += '<section><h2>⚠️ うわっと思われがち</h2><div class="card ng"><ul class="ngl">' + ngCards.flatMap(c => c.ng).map(t => '<li>' + esc(t) + '</li>').join('') + '</ul></div></section>';
     html += '<section><h2>学ぶ</h2>' + (arts.length
       ? '<ul class="list">' + arts.map(a => '<li><a class="row" href="#/article/' + a.id + '"><span class="ico">📖</span><div class="grow"><div>' + esc(a.title) + '</div><div class="sub">' + articleBadge(a) + '</div></div><span class="chev">›</span></a></li>').join('') + '</ul>'
       : '<div class="empty">この項目の記事はまだありません。<br><span class="sub">根拠のある情報が用意できるまで、無理に答えを作らない方針です。</span></div>') + '</section>';
@@ -667,7 +669,23 @@
       html += '</section>';
     });
     html += '<p class="sub center" style="margin-top:20px">' + AI_BADGE + ' カードの文章は現在すべてAIが作成した仮の内容です（出典確認前）。健康・安全に関わることは、製品の表示や専門家の情報を優先してください。</p>' +
-      '<ul class="list" style="margin-top:12px"><li><a class="row" href="#/learn"><span class="ico">📚</span><div class="grow">もっと細かい項目一覧（14カテゴリー）</div><span class="chev">›</span></a></li></ul>';
+      '<ul class="list" style="margin-top:12px"><li><a class="row" href="#/ng"><span class="ico">⚠️</span><div class="grow">うわっと思われがち集<div class="sub">やりすぎ・やりがちなこと</div></div><span class="chev">›</span></a></li><li><a class="row" href="#/learn"><span class="ico">📚</span><div class="grow">もっと細かい項目一覧（14カテゴリー）</div><span class="chev">›</span></a></li></ul>';
+    return html;
+  };
+
+  views.ng = function (area) {
+    const cards = visibleCards().filter(c => c.ng && c.ng.length);
+    let html = header('うわっと思われがち集', '#/map') +
+      '<p class="lead">やりすぎ・やりがちで「うわ」と思われやすいポイントです。足りないより、やりすぎの方が目立つ場合もあります。' + AI_BADGE + '</p>' +
+      seg([['#/ng', 'すべて']].concat(MAP.areas.map(a => ['#/ng?a=' + a.id, a.name])), area ? '#/ng?a=' + area : '#/ng');
+    const areas = area && areaMap[area] ? [areaMap[area]] : MAP.areas;
+    areas.forEach(a => {
+      const cs = cards.filter(c => c.area === a.id);
+      if (!cs.length) return;
+      html += '<section><h2>' + a.icon + ' ' + esc(a.name) + '</h2>' + cs.map(c =>
+        '<div class="card ng"><a class="title" href="#/card/' + c.id + '"><span class="lvtag inline lv' + c.level + '">Lv' + c.level + '</span> ' + esc(c.title) + '</a>' +
+        '<ul class="ngl">' + c.ng.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul></div>').join('') + '</section>';
+    });
     return html;
   };
 
@@ -685,6 +703,7 @@
       '<div class="card"><div class="sub">なぜ？</div><p>' + esc(c.why) + '</p></div>' +
       '<div class="card"><div class="sub">やり方</div><ol class="how">' + c.how.map(h => '<li>' + esc(h) + '</li>').join('') + '</ol>' +
       '<dl class="meta"><div><dt>費用</dt><dd>' + esc(c.cost) + '</dd></div><div><dt>時間・頻度</dt><dd>' + esc(c.time) + '</dd></div></dl></div>';
+    if (c.ng && c.ng.length) html += '<div class="card ng"><div class="sub">⚠️ うわっと思われがち</div><ul class="ngl">' + c.ng.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul></div>';
     if (c.enough) html += '<div class="card enough"><div class="sub">✋ 気にしすぎなくていいこと</div><p>' + esc(c.enough) + '</p></div>';
     if (c.sneaky) html += '<div class="card sneaky"><div class="sub">🤫 こっそり始めるコツ</div><p>' + esc(c.sneaky) + '</p></div>';
     html += '<section><h2>自分は？</h2><p class="sub" style="margin:0 0 8px">' + esc(c.q) + '</p><div class="actions wrap">' +
@@ -979,8 +998,8 @@
     const params = new URLSearchParams(query || '');
     const fn = views[name] || views.map;
     const y = window.scrollY;
-    $app.innerHTML = fn(name === 'learn' ? params.get('q') : name === 'map' ? params.get('a') : arg);
-    const tab = { map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
+    $app.innerHTML = fn(name === 'learn' ? params.get('q') : (name === 'map' || name === 'ng') ? params.get('a') : arg);
+    const tab = { ng: 'map', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
       habits: 'habits', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'map';
     document.querySelectorAll('.tabbar a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
     if (hash !== lastRoute) window.scrollTo(0, 0); else window.scrollTo(0, y);

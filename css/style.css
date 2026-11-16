@@ -273,3 +273,8 @@ li.row { padding: 10px 14px; }
 .badge.ai { background: #e8e3f7; color: #5b3f8c; }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .badge.ai { background: #2d2540; color: #c7b3ee; } }
 .ai-notice { border-left-color: #7a5cc0; background: var(--lv3-soft); }
+
+.ng { border-left: 4px solid var(--lv1); }
+.ng .title { display: block; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+.ngl { margin: 6px 0 0; padding-left: 20px; }
+.ngl li { margin: 4px 0; }
