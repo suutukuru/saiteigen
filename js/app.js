@@ -409,9 +409,9 @@
     const a = articleMap[id];
     if (!a) return notFound();
     const SEC = [
-      ['what', '1. これは何か'], ['why', '2. なぜ気にする必要があるのか'], ['recommended', '3. 一般的におすすめされる方法'],
-      ['howto', '4. 具体的なやり方'], ['tools', '5. 必要な道具・用品'], ['choose', '6. 道具・用品の選び方'],
-      ['caution', '7. 注意点'], ['frequency', '8. 実施頻度'], ['maintain', '9. 維持・管理方法']
+      ['what', '概要'], ['why', 'なぜ必要なのか'], ['standard', '一般的な基準'], ['recommended', '推奨される方法'],
+      ['howto', '具体的な手順'], ['tools', '必要な道具・商品'], ['choose', '選び方'],
+      ['caution', '注意点'], ['frequency', '実施頻度'], ['maintain', '維持管理方法'], ['enough', '気にしすぎなくていいこと']
     ];
     const back = a.items && a.items[0] ? '#/item/' + a.items[0] : '#/articles';
     let html = header('記事', back) + '<article class="article"><h1>' + esc(a.title) + '</h1>' +
@@ -427,7 +427,7 @@
         return '<p>' + esc(t.text) + (t.basis ? ' <span class="basis b-' + t.basis + '">' + esc(D.reliabilityTypes[t.basis] || t.basis) + '</span>' : '') + '</p>';
       }).join('');
     });
-    html += '<h2>10. 参考情報・出典</h2>';
+    html += '<h2>参考情報・情報源</h2>';
     if (a.sources && a.sources.length) {
       html += '<ul class="sources">' + a.sources.map(s => '<li><a href="' + esc(s.url) + '" target="_blank" rel="noopener">' + esc(s.title) + '</a>' +
         '<div class="sub">' + esc(s.publisher || '') + ' · ' + esc(D.reliabilityTypes[s.type] || '') + ' · ' +
@@ -552,8 +552,9 @@
 
   views.about = function () {
     return header('このアプリについて', '#/my') + '<article class="article">' +
-      '<p>大人として生活していくうえで、知っておきたいこと・気にしたいこと・できるようになりたいことを一か所に集約するアプリです。</p>' +
-      '<h2>大切にしていること</h2><p>・知っていて当然という前提を置きません。<br>・個性を否定せず、判断材料と改善の観点を提供します。<br>・流行や好みは「必須」ではありません。</p>' +
+      '<p class="tagline">知らなかったことを、今から学ぶ。<br>できなかったことを、できるようにする。<br>普通にできるようになる。そして、格好よくなる。</p>' +
+      '<p>大人になる過程で自然に身につける機会があったはずの知識や習慣を、今から体系的に学び、実践できるようにするアプリです。</p>' +
+      '<h2>大切にしていること</h2><p>・知っていて当然という前提を置きません。<br>・個性を否定せず、判断材料と改善の観点を提供します。<br>・流行や好みは「必須」ではありません。<br>・必要以上に気にしたり、完璧を目指したりしなくて大丈夫です。一般的な許容範囲や個人差も伝えます。<br>・商品紹介を目的にせず、まず知識と判断基準を伝えます。</p>' +
       '<h2>情報の信頼性</h2><p>記事には出典・最終確認日・更新履歴を付けます。本文の各段落には、根拠の種類（公的情報・専門家の推奨・一般的な慣習・個人の好み など）を表示します。</p>' +
       '<p>出典の確認が終わっていない記事は「下書き・出典確認前」と表示されます。正しい情報を用意できない項目には、無理に答えを作りません。</p>' +
       '<p>このアプリは医学的な診断や、外見・人格についての断定を行いません。体調や肌の不調が続く場合は医療機関に相談してください。</p>' +
@@ -617,7 +618,7 @@
     const areas = area && areaMap[area] ? [areaMap[area]] : MAP.areas;
     const answered = visibleCards().filter(c => S.map[c.id]).length;
     const all = visibleCards().length;
-    let html = '<header class="hero"><div class="sub">普通の人が、こっそりやっていること</div><h1>さいていげんマップ</h1></header>';
+    let html = '<header class="hero"><div class="sub">普通にできるようになる。そして、格好よくなる。</div><h1>さいていげんマップ</h1></header>';
     if (answered < all) {
       html += '<a class="card cta" href="#/diag"><strong>' + (answered ? '診断のつづき（' + answered + '/' + all + '）' : 'まず診断してみる（約' + Math.ceil(all / 10) + '分）') + '</strong>' +
         '<span class="sub">はい／いいえで答えるだけで、自分の「抜け」がマップに出ます。答えはこの端末にしか残りません。</span></a>';
@@ -641,7 +642,7 @@
       html += '</section>';
     });
     html += '<p class="sub center" style="margin-top:20px">内容は編集中の下書きです。健康・安全に関わることは、製品の表示や専門家の情報を優先してください。</p>' +
-      '<ul class="list" style="margin-top:12px"><li><a class="row" href="#/learn"><span class="ico">📚</span><div class="grow">もっと細かい項目一覧（13カテゴリー）</div><span class="chev">›</span></a></li></ul>';
+      '<ul class="list" style="margin-top:12px"><li><a class="row" href="#/learn"><span class="ico">📚</span><div class="grow">もっと細かい項目一覧（14カテゴリー）</div><span class="chev">›</span></a></li></ul>';
     return html;
   };
 
@@ -659,6 +660,7 @@
       '<div class="card"><div class="sub">なぜ？</div><p>' + esc(c.why) + '</p></div>' +
       '<div class="card"><div class="sub">やり方</div><ol class="how">' + c.how.map(h => '<li>' + esc(h) + '</li>').join('') + '</ol>' +
       '<dl class="meta"><div><dt>費用</dt><dd>' + esc(c.cost) + '</dd></div><div><dt>時間・頻度</dt><dd>' + esc(c.time) + '</dd></div></dl></div>';
+    if (c.enough) html += '<div class="card enough"><div class="sub">✋ 気にしすぎなくていいこと</div><p>' + esc(c.enough) + '</p></div>';
     if (c.sneaky) html += '<div class="card sneaky"><div class="sub">🤫 こっそり始めるコツ</div><p>' + esc(c.sneaky) + '</p></div>';
     html += '<section><h2>自分は？</h2><p class="sub" style="margin:0 0 8px">' + esc(c.q) + '</p><div class="actions wrap">' +
       btn('ok', '✓ できてる') + btn('gap', 'まだ') + btn('skip', '自分には不要') + '</div></section>';

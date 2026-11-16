@@ -266,3 +266,6 @@ li.row { padding: 10px 14px; }
 .diag .q { font-size: 20px; font-weight: 700; line-height: 1.5; margin: 10px 0 18px; }
 .diag-btns { display: flex; flex-direction: column; gap: 8px; }
 .diag-btns .btn { min-height: 50px; font-size: 16px; }
+
+.enough { background: var(--ok-soft); border-color: transparent; }
+.tagline { font-weight: 700; line-height: 1.8; }

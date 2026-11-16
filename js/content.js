@@ -8,7 +8,7 @@
  *   sources     : 出典 [{ title, publisher, url, type, verified(主張を裏付けているか確認済みか), checkedAt }]
  *   checkedAt   : 最終確認日 (YYYY-MM-DD)
  *   history     : 更新履歴 [{ date, note }]
- *   sections    : 基本構成 1〜9（what / why / recommended / howto / tools / choose / caution / frequency / maintain）
+ *   sections    : 基本構成（what / why / standard(一般的な基準) / recommended / howto / tools / choose / caution / frequency / maintain / enough(気にしすぎなくていいこと)）
  *                 本文中の各段落は { text, basis } の形にでき、basis で「一般的な推奨」「好み」等を区別します。
  *
  * 【注意】ここに入っている本文はアプリの動作確認用の「下書き」です。

@@ -173,6 +173,7 @@ window.SAITEIGEN_DATA = (function () {
         I('dryer-machine', '乾燥機', { kind: 'knowledge', viewpoint: '乾燥機にかけてはいけない衣類を判別できるか' }),
         I('iron', 'アイロン・スチーマー', { viewpoint: 'シワのある服をそのまま着ていないか' }),
         I('pilling', '毛玉取り', { viewpoint: '毛玉が目立つ服を着ていないか' }),
+        I('lint', 'ほこり・糸くずの処理', { viewpoint: '服にほこりや糸くず、ペットの毛が付いたままになっていないか' }),
         I('cleaning-shop', 'クリーニング', { kind: 'knowledge', viewpoint: '家で洗えない服をクリーニングに出せているか' }),
         I('koromogae', '衣替え', { viewpoint: '季節の変わり目に衣類を入れ替えているか', tasks: [{ name: '衣替え', freq: 'seasonal' }] }),
         I('storage', '衣類の保管', { viewpoint: '湿気・虫食い対策ができているか' }),
@@ -284,7 +285,10 @@ window.SAITEIGEN_DATA = (function () {
         I('leisure', 'レジャー', { viewpoint: '季節や相手に合った過ごし方を選べるか' }),
         I('season-event', '季節イベント', { viewpoint: '季節ごとの行事を楽しめているか' }),
         I('present', 'プレゼント', { viewpoint: '相手や関係性に合った贈り物を選べるか' }),
-        I('reservation', '予約方法', { viewpoint: '電話・Webでの予約やキャンセルのマナーを知っているか' })
+        I('reservation', '予約方法', { viewpoint: '電話・Webでの予約やキャンセルのマナーを知っているか' }),
+        I('price-mood', '価格帯や雰囲気の判断', { viewpoint: '口コミ・写真・メニューから価格帯と雰囲気を判断できるか' }),
+        I('purpose-shop', '目的や相手に応じた店選び', { viewpoint: '誰と・何のために行くかで店を選べているか' }),
+        I('gift-shop', '贈り物を購入する店舗', { viewpoint: '贈り物を買える店（百貨店・専門店など）を知っているか' })
       ]
     },
     {
@@ -314,7 +318,8 @@ window.SAITEIGEN_DATA = (function () {
         I('topic', '話題の広げ方', { viewpoint: '相手の話から話題を広げられるか' }),
         I('voice', '声の大きさ・話す速度', { viewpoint: '場面に合った声量・速さで話せているか' }),
         I('keigo', '敬語・言葉遣い', { kind: 'knowledge', viewpoint: '基本的な敬語を使い分けられるか' }),
-        I('chat', 'LINE・チャットの表現', { viewpoint: '文面がそっけなさすぎ・長すぎになっていないか' })
+        I('chat', 'LINE・チャットの表現', { viewpoint: '文面がそっけなさすぎ・長すぎになっていないか' }),
+        I('distance', '相手との距離感', { viewpoint: '関係性に対して近づきすぎ・踏み込みすぎていないか' })
       ]
     },
     {
@@ -336,6 +341,23 @@ window.SAITEIGEN_DATA = (function () {
         I('local-culture', '旅行・地域文化', { viewpoint: '地域の文化や名産に関心を持てているか（好みの範囲）' }),
         I('sports', 'スポーツ', { viewpoint: '話題として知っているスポーツがあるか（好みの範囲）' }),
         I('season-custom', '季節行事', { viewpoint: '主な年中行事の意味を知っているか' })
+      ]
+    },
+    {
+      id: 'c14', no: '14', name: 'プレゼント・贈り物', icon: '🎁', kind: 'knowledge',
+      description: '相手と場面に合った贈り物を、無理なく選べるように。',
+      items: [
+        I('gift-scene', 'プレゼントを贈る場面', { viewpoint: '誕生日・お礼・お祝いなど、贈り物をする場面を知っているか' }),
+        I('gift-relation', '相手との関係性に応じた選び方', { viewpoint: '関係性に対して重すぎ・軽すぎない贈り物を選べるか',
+          suggest: { text: '贈り物の基本の考え方（関係性・予算・好み）を確認する', reason: '贈り物は「相手の負担にならないこと」が大切とされ、関係性で適切な内容が変わります。', priority: 2, effect: '贈り物で失敗しにくくなる', cost: '0円（確認のみ）', time: '10分' } }),
+        I('gift-budget', '一般的な予算感', { viewpoint: '関係性や目的に対して、予算が極端に高すぎ・低すぎないか' }),
+        I('gift-purpose', '誕生日・記念日・お礼など目的別の選び方', { viewpoint: '目的に合った贈り物を選べるか' }),
+        I('gift-taste', '相手の好みの把握', { viewpoint: '普段の会話から相手の好みを覚えておけているか' }),
+        I('gift-avoid', '避けた方がよい贈り物', { viewpoint: '場面によって避けた方がよいとされる品を知っているか' }),
+        I('gift-type', '消耗品・食品・雑貨などの特徴', { viewpoint: '残る物・消える物の違いを考えて選べるか' }),
+        I('wrapping', 'ラッピング', { viewpoint: '場面に合った包装・のしを選べるか' }),
+        I('gift-timing', '渡すタイミングや方法', { viewpoint: '相手の負担にならないタイミング・渡し方ができるか' }),
+        I('gift-return', 'お返しやお礼の考え方', { viewpoint: 'もらった後のお礼・お返しをきちんとできているか', tasks: [{ name: 'もらった物のお礼・お返しを確認', freq: 'irregular', interval: 30 }] })
       ]
     }
   ];
@@ -382,6 +404,7 @@ window.SAITEIGEN_DATA = (function () {
   // 情報の分類（要件定義 10章）
   const reliabilityTypes = {
     official: '公的・制度的情報',
+    maker: 'メーカーの公式情報',
     science: '科学的・医学的根拠',
     expert: '専門家の推奨',
     custom: '一般的な慣習',
