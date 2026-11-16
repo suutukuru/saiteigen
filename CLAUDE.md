@@ -20,6 +20,10 @@
 - 記事・カードの本文は下書き。出典を確認し、主張を裏付けると確かめるまで `status: 'draft'` のままにする（AI生成文をそのまま確定扱いにしない）。
 - 事実・専門家の推奨・慣習・好みを区別して書く。医学的診断や人格の断定はしない。
 - 根拠が用意できない項目には、無理に答えを作らない。
+- **AI仮情報**：現在の本文（`js/ai-draft/`、`js/content.js` の `origin: 'ai'`、`js/map.js` のカード）はすべてAIが書いた仮の内容で、画面に「AI仮情報」と表示される。仕組み・差し替え方は `js/ai-draft/README.md`。
+  - AIが新しく書く文章は、必ず AI仮情報として扱う（ai-draft に置く／`origin: 'ai'` を付ける）。確認済み扱いにしない。
+  - 人が確認した内容は `js/content.js` に `origin: 'human'` で入れる（ai-draft より優先される）。カードは `origin: 'verified'`。
+  - 残数の確認：`node tools/ai-report.js`
 
 ## 確認方法
 - `python3 -m http.server 8765` で起動し、Playwright（iPhoneサイズ）で動作確認する。

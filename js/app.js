@@ -20,6 +20,28 @@
       itemMap[it.id] = it;
     });
   });
+  // 【AI仮情報】js/ai-draft/ の下書きから記事を組み立てる。
+  // その項目を扱う記事が js/content.js にあれば、そちらを優先し AI仮情報は使わない。
+  const covered = new Set(ARTICLES.flatMap(a => a.items || []));
+  const AI_DRAFT = window.SAITEIGEN_AI_DRAFT || {};
+  Object.keys(AI_DRAFT).forEach(itemId => {
+    const it = itemMap[itemId];
+    const d = AI_DRAFT[itemId];
+    if (!it || covered.has(itemId)) return;
+    const one = v => (v ? [{ text: v }] : []);
+    ARTICLES.push({
+      id: 'ai-' + itemId, title: it.name, items: [itemId], origin: 'ai', status: 'draft', reliability: 'uncertain',
+      checkedAt: null, sources: [], history: [],
+      sections: {
+        what: one(d.s), why: one(d.w), standard: one(d.b),
+        howto: (d.h || []).map((x, i) => ({ text: (i + 1) + '. ' + x })),
+        tools: one(d.t), frequency: one(d.f), caution: one(d.c), enough: one(d.e)
+      }
+    });
+    it.articles = (it.articles || []).concat('ai-' + itemId);
+  });
+  // カードは c.origin が無ければ MAP.origin（既定 'ai'）。確認済みにしたら c.origin = 'verified'
+  const isAi = x => (x.origin || (x.area ? MAP.origin : null)) === 'ai';
   const articleMap = {};
   ARTICLES.forEach(a => { articleMap[a.id] = a; });
   const allItems = Object.values(itemMap);
@@ -195,7 +217,9 @@
   // ---------- 部品 ----------
   const bar = p => '<div class="bar"><span style="width:' + Math.round(p * 100) + '%"></span></div>';
   const badge = (t, cls) => '<span class="badge ' + (cls || '') + '">' + esc(t) + '</span>';
-  const articleBadge = a => ({
+  const AI_BADGE = '<span class="badge ai">AI仮情報</span>';
+  const AI_NOTICE = '<div class="notice ai-notice"><strong>AI仮情報</strong>：この内容はAIが作成した仮の文章です。出典の確認や人によるレビューはまだです。参考程度に読み、健康・安全に関わることは製品の表示・公的機関・専門家の情報を優先してください。</div>';
+  const articleBadge = a => a.origin === 'ai' ? AI_BADGE : ({
     draft: badge('下書き・出典確認前', 'warn'),
     review: badge('確認中', 'warn'),
     published: badge('出典確認済み', 'ok')
@@ -416,7 +440,8 @@
     const back = a.items && a.items[0] ? '#/item/' + a.items[0] : '#/articles';
     let html = header('記事', back) + '<article class="article"><h1>' + esc(a.title) + '</h1>' +
       '<div class="sub">' + articleBadge(a) + ' 分類：' + esc(D.reliabilityTypes[a.reliability] || '—') + ' · 最終確認日：' + esc(a.checkedAt || '未確認') + '</div>';
-    if (a.status !== 'published') {
+    if (a.origin === 'ai') html += AI_NOTICE;
+    else if (a.status !== 'published') {
       html += '<div class="notice">この記事は<strong>下書き</strong>です。出典による裏付けと編集者の確認がまだ終わっていません。参考程度に読み、安全や健康に関わることは製品の説明書・公的機関・専門家の情報を優先してください。</div>';
     }
     SEC.forEach(([k, label]) => {
@@ -641,7 +666,7 @@
       });
       html += '</section>';
     });
-    html += '<p class="sub center" style="margin-top:20px">内容は編集中の下書きです。健康・安全に関わることは、製品の表示や専門家の情報を優先してください。</p>' +
+    html += '<p class="sub center" style="margin-top:20px">' + AI_BADGE + ' カードの文章は現在すべてAIが作成した仮の内容です（出典確認前）。健康・安全に関わることは、製品の表示や専門家の情報を優先してください。</p>' +
       '<ul class="list" style="margin-top:12px"><li><a class="row" href="#/learn"><span class="ico">📚</span><div class="grow">もっと細かい項目一覧（14カテゴリー）</div><span class="chev">›</span></a></li></ul>';
     return html;
   };
@@ -655,8 +680,8 @@
     const btn = (k, label) => '<button class="btn ' + (S.map[c.id] === k ? 'primary' : '') + '" data-act="card-state" data-id="' + c.id + '" data-v="' + k + '">' + label + '</button>';
     let html = header(a.icon + ' ' + a.name, '#/map?a=' + c.area) +
       '<div class="cardhead"><span class="lvtag inline lv' + c.level + '">Lv' + c.level + ' ' + esc(lvName(c.level)) + '</span>' +
-      '<span class="badge ' + STATE_UI[st][2] + '">' + STATE_UI[st][1] + '</span></div>' +
-      '<h1 class="ctitle">' + esc(c.title) + '</h1>' +
+      '<span class="badge ' + STATE_UI[st][2] + '">' + STATE_UI[st][1] + '</span>' + (isAi(c) ? AI_BADGE : '') + '</div>' +
+      '<h1 class="ctitle">' + esc(c.title) + '</h1>' + (isAi(c) ? AI_NOTICE : '') +
       '<div class="card"><div class="sub">なぜ？</div><p>' + esc(c.why) + '</p></div>' +
       '<div class="card"><div class="sub">やり方</div><ol class="how">' + c.how.map(h => '<li>' + esc(h) + '</li>').join('') + '</ol>' +
       '<dl class="meta"><div><dt>費用</dt><dd>' + esc(c.cost) + '</dd></div><div><dt>時間・頻度</dt><dd>' + esc(c.time) + '</dd></div></dl></div>';

@@ -269,3 +269,7 @@ li.row { padding: 10px 14px; }
 
 .enough { background: var(--ok-soft); border-color: transparent; }
 .tagline { font-weight: 700; line-height: 1.8; }
+
+.badge.ai { background: #e8e3f7; color: #5b3f8c; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .badge.ai { background: #2d2540; color: #c7b3ee; } }
+.ai-notice { border-left-color: #7a5cc0; background: var(--lv3-soft); }

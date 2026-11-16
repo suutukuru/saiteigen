@@ -3,6 +3,7 @@
  * ------------------------------------------------------------
  * 要件定義「10. 情報の信頼性・品質管理」に従い、各記事は以下を持ちます。
  *
+ *   origin      : 'ai' = AI仮情報（画面に「AI仮情報」と表示）。人が書き直し・確認したら 'human' に変える
  *   status      : 'draft'(下書き・出典確認前) / 'review'(確認中) / 'published'(確認済み) / 'archived'(非公開)
  *   reliability : 主な情報の分類（data.js の reliabilityTypes のキー）
  *   sources     : 出典 [{ title, publisher, url, type, verified(主張を裏付けているか確認済みか), checkedAt }]
@@ -22,6 +23,7 @@ window.SAITEIGEN_CONTENT = [
     id: 'a-brow',
     title: '眉毛の整え方（基本）',
     items: ['brow', 'brow-salon'],
+    origin: 'ai',
     status: 'draft',
     reliability: 'custom',
     checkedAt: null,
@@ -57,6 +59,7 @@ window.SAITEIGEN_CONTENT = [
     id: 'a-skincare',
     title: 'スキンケアの基本（洗顔・保湿・紫外線対策）',
     items: ['skincare', 'face-wash', 'lotion', 'moisture', 'sunscreen'],
+    origin: 'ai',
     status: 'draft',
     reliability: 'expert',
     checkedAt: null,
@@ -86,6 +89,7 @@ window.SAITEIGEN_CONTENT = [
     id: 'a-care-label',
     title: '洗濯表示の読み方',
     items: ['care-label'],
+    origin: 'ai',
     status: 'draft',
     reliability: 'official',
     checkedAt: null,
@@ -113,6 +117,7 @@ window.SAITEIGEN_CONTENT = [
     id: 'a-namagawaki',
     title: '生乾き臭を防ぐ',
     items: ['namagawaki', 'namagawaki-wash', 'cloth-odor'],
+    origin: 'ai',
     status: 'draft',
     reliability: 'custom',
     checkedAt: null,
@@ -142,6 +147,7 @@ window.SAITEIGEN_CONTENT = [
     id: 'a-self-deprecation',
     title: '自虐との付き合い方',
     items: ['self-deprecation', 'humblebrag'],
+    origin: 'ai',
     status: 'draft',
     reliability: 'uncertain',
     checkedAt: null,

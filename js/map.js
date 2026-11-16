@@ -21,12 +21,15 @@
  *   habit   : 習慣に登録するときのひな型 { name, freq, interval }
  *   item    : 詳しい項目（js/data.js）の id（任意）
  *   enough  : 気にしすぎなくていいこと（一般的な許容範囲・個人差）（任意）
+ *   origin  : 'verified'（人が確認済み）にするとAI仮情報の表示が消える（任意。既定は上の origin）
  *   for     : 対象 'all'（将来 'men' / 'women' などで分ける余地）
  *
  * 【注意】本文は編集中の下書きです。健康・安全に関わる内容は、製品の表示や専門家の情報を優先してください。
  */
 
 window.SAITEIGEN_MAP = {
+  // 'ai' = カード本文はすべてAI仮情報。カードごとに origin: 'verified' を付けると、そのカードは「AI仮情報」表示が消える
+  origin: 'ai',
   levels: [
     { level: 1, name: '最低限', desc: 'やってないと気づかれる' },
     { level: 2, name: '普通', desc: '多くの人がやっている' },
