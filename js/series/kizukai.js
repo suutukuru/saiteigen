@@ -6,7 +6,7 @@
  * 【AI仮情報】本文はすべて AI が書いた仮の内容です。
  */
 (window.SAITEIGEN_SERIES = window.SAITEIGEN_SERIES || []).push({
-  id: 'kizukai', name: '気づかいのさじ加減', icon: '🤝', origin: 'ai',
+  id: 'kizukai', name: '気づかいのさじ加減', icon: '🤝', origin: 'ai', section: 'during',
   desc: '気づかいは「足りない」も「やりすぎ」もうまくいかない。自分基準で我慢させてしまう、逆に下に出すぎて仲良くなれない、など。',
   fields: [
     ['q', 'こんなこと、ない？', 'text'],

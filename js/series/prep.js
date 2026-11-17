@@ -6,7 +6,7 @@
  * 【AI仮情報】本文はすべて AI が書いた仮の内容です。
  */
 (window.SAITEIGEN_SERIES = window.SAITEIGEN_SERIES || []).push({
-  id: 'prep', name: '事前準備', icon: '🧭', origin: 'ai',
+  id: 'prep', name: '事前準備', icon: '🧭', origin: 'ai', section: 'before',
   desc: 'スマートに見える人は、当日より前に準備している。2件探す・近くを調べる・予約するかを決める、など。',
   fields: [
     ['why', 'なぜ', 'text'],

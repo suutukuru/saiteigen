@@ -846,6 +846,7 @@
     const out = [];
     const add = (href, icon, label) => out.push('<li><a class="row" href="' + href + '"><span class="ico">' + icon + '</span><div class="grow">' + esc(label) + '</div><span class="chev">›</span></a></li>');
     if (x.prep && seriesItem[x.prep]) add('#/s/prep/' + x.prep, '🧭', '事前準備：' + seriesItem[x.prep].it.title);
+    if (x.nakayoku && seriesItem[x.nakayoku]) add('#/s/nakayoku/' + x.nakayoku, '🫂', '仲良くなる：' + seriesItem[x.nakayoku].it.title);
     if (x.kizukai && seriesItem[x.kizukai]) add('#/s/kizukai/' + x.kizukai, '🤝', 'さじ加減：' + seriesItem[x.kizukai].it.title);
     if (x.trouble && trMap[x.trouble]) add('#/trouble/' + x.trouble, '🆘', 'トラブル：' + trMap[x.trouble].title);
     if (x.judge && JG.guides.find(g => g.id === x.judge)) add('#/guide/' + x.judge, '🤔', '判断のコツ：' + JG.guides.find(g => g.id === x.judge).title);
@@ -859,12 +860,13 @@
     return '<header class="hero"><div class="sub">スマートな人が自然にやっていること</div><h1>シーン</h1></header>' +
       '<a class="sos-btn" href="#/sos">🆘 いま困ってる（トラブル対処）</a>' +
       '<section><h2>出かける前に</h2>' +
-      SERIES.filter(sr => sr.id === 'prep').map(sr => tile('#/s/' + sr.id, sr.icon, sr.name, sr.desc, sr.items.length)).join('') +
+      SERIES.filter(sr => sr.section === 'before').map(sr => tile('#/s/' + sr.id, sr.icon, sr.name, sr.desc, sr.items.length)).join('') +
       tile('#/judge', '🤔', '判断のコツ', '予約する？その場で行く？ 奢る？割り勘？ 正解が場面で変わること', JG.guides.length) + '</section>' +
       '<section><h2>その場で</h2>' +
-      SERIES.filter(sr => sr.id !== 'prep').map(sr => tile('#/s/' + sr.id, sr.icon, sr.name, sr.desc, sr.items.length)).join('') +
+      SERIES.filter(sr => !sr.section || sr.section === 'during').map(sr => tile('#/s/' + sr.id, sr.icon, sr.name, sr.desc, sr.items.length)).join('') +
       tile('#/sos', '🆘', 'トラブル対処', '満席・休み・ホテル満室・沈黙・終電・事故など', TR.cases.length) +
       tile('#/ng', '⚠️', 'うわっと思われがち集', 'やりすぎ・やりがちなこと', '') + '</section>' +
+      '<section><h2>人との距離を縮める</h2>' + SERIES.filter(sr => sr.section === 'relation').map(sr => tile('#/s/' + sr.id, sr.icon, sr.name, sr.desc, sr.items.length)).join('') + '</section>' +
       '<p class="sub center" style="margin-top:16px">' + AI_BADGE + ' 内容はすべてAIが作成した仮の文章です。</p>';
   };
 
