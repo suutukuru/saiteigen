@@ -672,16 +672,26 @@
       html += '</section>';
     });
     html += '<p class="sub center" style="margin-top:20px">' + AI_BADGE + ' カードの文章は現在すべてAIが作成した仮の内容です（出典確認前）。健康・安全に関わることは、製品の表示や専門家の情報を優先してください。</p>' +
-      '<ul class="list" style="margin-top:12px"><li><a class="row" href="#/ng"><span class="ico">⚠️</span><div class="grow">うわっと思われがち集<div class="sub">やりすぎ・やりがちなこと</div></div><span class="chev">›</span></a></li><li><a class="row" href="#/learn"><span class="ico">📚</span><div class="grow">もっと細かい項目一覧（14カテゴリー）</div><span class="chev">›</span></a></li></ul>';
+      '<ul class="list" style="margin-top:12px"><li><a class="row" href="#/mapng"><span class="ico">🚫</span><div class="grow">これは論外NG集<div class="sub">爪・鼻毛・匂い・服など、身だしなみの「うわっ」</div></div><span class="chev">›</span></a></li><li><a class="row" href="#/learn"><span class="ico">📚</span><div class="grow">もっと細かい項目一覧（14カテゴリー）</div><span class="chev">›</span></a></li></ul>';
     return html;
   };
 
-  views.ng = function (area) {
+  // 「うわっと思われがち」は2か所に分ける
+  //  ・マップ側（#/mapng）：見た目・匂い・持ち物の「論外」系（爪・鼻毛・匂い など）
+  //  ・シーン側（#/ng）  ：振る舞い・お出かけ（プランB・立て直し・店選び など）
+  const NG_SIDES = {
+    mapng: { areas: ['look', 'smell', 'things'], back: '#/map', title: 'これは論外NG集',
+      lead: '身だしなみ・匂い・持ち物で、やっていない（やりすぎている）と「うわ」と思われやすいポイントです。' },
+    ng: { areas: ['know', 'social'], back: '#/scene', title: 'うわっと思われがち集',
+      lead: '振る舞いやお出かけで、やりがち・やりすぎで「うわ」と思われやすいポイントです。' }
+  };
+  function ngPage(side, area) {
+    const cfg = NG_SIDES[side];
+    const all = MAP.areas.filter(a => cfg.areas.includes(a.id));
     const cards = visibleCards().filter(c => c.ng && c.ng.length);
-    let html = header('うわっと思われがち集', '#/scene') +
-      '<p class="lead">やりすぎ・やりがちで「うわ」と思われやすいポイントです。足りないより、やりすぎの方が目立つ場合もあります。' + AI_BADGE + '</p>' +
-      seg([['#/ng', 'すべて']].concat(MAP.areas.map(a => ['#/ng?a=' + a.id, a.name])), area ? '#/ng?a=' + area : '#/ng');
-    const areas = area && areaMap[area] ? [areaMap[area]] : MAP.areas;
+    let html = header(cfg.title, cfg.back) + '<p class="lead">' + esc(cfg.lead) + ' ' + AI_BADGE + '</p>' +
+      seg([['#/' + side, 'すべて']].concat(all.map(a => ['#/' + side + '?a=' + a.id, a.name])), area ? '#/' + side + '?a=' + area : '#/' + side);
+    const areas = area && all.some(a => a.id === area) ? [areaMap[area]] : all;
     areas.forEach(a => {
       const cs = cards.filter(c => c.area === a.id);
       if (!cs.length) return;
@@ -690,7 +700,9 @@
         '<ul class="ngl">' + c.ng.map(t => '<li>' + esc(t) + '</li>').join('') + '</ul></div>').join('') + '</section>';
     });
     return html;
-  };
+  }
+  views.ng = area => ngPage('ng', area);
+  views.mapng = area => ngPage('mapng', area);
 
   views.card = function (id) {
     const c = cardMap[id];
@@ -865,7 +877,7 @@
       '<section><h2>その場で</h2>' +
       SERIES.filter(sr => !sr.section || sr.section === 'during').map(sr => tile('#/s/' + sr.id, sr.icon, sr.name, sr.desc, sr.items.length)).join('') +
       tile('#/sos', '🆘', 'トラブル対処', '満席・休み・ホテル満室・沈黙・終電・事故など', TR.cases.length) +
-      tile('#/ng', '⚠️', 'うわっと思われがち集', 'やりすぎ・やりがちなこと', '') + '</section>' +
+      tile('#/ng', '⚠️', 'うわっと思われがち集', '振る舞い・お出かけでやりがちなこと（プランBなし・不機嫌になる など）', '') + '</section>' +
       '<section><h2>人との距離を縮める</h2>' + SERIES.filter(sr => sr.section === 'relation').map(sr => tile('#/s/' + sr.id, sr.icon, sr.name, sr.desc, sr.items.length)).join('') + '</section>' +
       '<p class="sub center" style="margin-top:16px">' + AI_BADGE + ' 内容はすべてAIが作成した仮の文章です。</p>';
   };
@@ -1154,8 +1166,8 @@
     const params = new URLSearchParams(query || '');
     const fn = views[name] || views.map;
     const y = window.scrollY;
-    $app.innerHTML = fn(name === 'learn' ? params.get('q') : (name === 'map' || name === 'ng') ? params.get('a') : arg, arg2);
-    const tab = { scene: 'scene', s: 'scene', judge: 'scene', guide: 'scene', sos: 'scene', trouble: 'scene', ng: 'scene', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
+    $app.innerHTML = fn(name === 'learn' ? params.get('q') : (name === 'map' || name === 'ng' || name === 'mapng') ? params.get('a') : arg, arg2);
+    const tab = { mapng: 'map', scene: 'scene', s: 'scene', judge: 'scene', guide: 'scene', sos: 'scene', trouble: 'scene', ng: 'scene', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
       habits: 'home', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'map';
     document.querySelectorAll('.tabbar a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
     if (hash !== lastRoute) window.scrollTo(0, 0); else window.scrollTo(0, y);
