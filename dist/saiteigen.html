@@ -311,6 +311,14 @@ li.row { padding: 10px 14px; }
 .side-a { border-top: 4px solid var(--lv2); }
 .side-b { border-top: 4px solid var(--lv3); }
 
+/* ---- シーン ---- */
+.scene-tile { display: flex; align-items: center; gap: 12px; color: var(--text); }
+.scene-tile strong { display: block; }
+.scene-tile .sub { display: block; margin-top: 2px; }
+.kz-under { border-left: 4px solid #3b82c4; }
+.kz-over { border-left: 4px solid var(--lv1); }
+.kz-just { border-left: 4px solid var(--ok); background: var(--ok-soft); }
+
 </style>
 </head>
 <body>
@@ -318,13 +326,13 @@ li.row { padding: 10px 14px; }
 <nav class="tabbar" aria-label="メイン">
   <a href="#/map" data-tab="map"><span>🗺️</span>マップ</a>
   <a href="#/home" data-tab="home"><span>✅</span>今日</a>
-  <a href="#/habits" data-tab="habits"><span>🔁</span>習慣</a>
+  <a href="#/scene" data-tab="scene"><span>🎬</span>シーン</a>
   <a href="#/belongings" data-tab="own"><span>🎒</span>持ち物</a>
   <a href="#/my" data-tab="my"><span>👤</span>マイ</a>
 </nav>
 <div id="sheet" class="sheet"></div>
 <div id="toast" class="toast" role="status"></div>
-<script>window.SAITEIGEN_VERSION = '0.7.0';</script>
+<script>window.SAITEIGEN_VERSION = '0.8.0';</script>
 <script>
 /*
  * カテゴリー・項目データ
@@ -1737,6 +1745,274 @@ window.SAITEIGEN_JUDGE = {
 
 </script>
 <script>
+/*
+ * 事前準備シリーズ
+ * ------------------------------------------------------------
+ * 「スマートな人は自然にやっている、出かける前の準備」。
+ * 形式は js/series/README.md を参照。
+ * 【AI仮情報】本文はすべて AI が書いた仮の内容です。
+ */
+(window.SAITEIGEN_SERIES = window.SAITEIGEN_SERIES || []).push({
+  id: 'prep', name: '事前準備', icon: '🧭', origin: 'ai',
+  desc: 'スマートに見える人は、当日より前に準備している。2件探す・近くを調べる・予約するかを決める、など。',
+  fields: [
+    ['why', 'なぜ', 'text'],
+    ['steps', '✅ やること', 'ol', 'tr-now'],
+    ['say', '💬 言い方の例', 'bubble'],
+    ['tip', '🤫 こっそりのコツ', 'text', 'sneaky'],
+    ['ng', '⚠️ やりがちNG', 'ul', 'ng'],
+    ['enough', '✋ ここまでで十分', 'text', 'enough']
+  ],
+  groups: [
+    { id: 'date', name: 'デート・お出かけ', icon: '💑' },
+    { id: 'travel', name: '旅行・遠出', icon: '🧳' },
+    { id: 'party', name: '飲み会・集まり', icon: '🍻' }
+  ],
+  items: [
+    // ===== デート・お出かけ =====
+    { id: 'pr-shop2', group: 'date', title: '店は「第2候補」まで決めておく',
+      why: '満席・休み・想像と違った、は普通に起きます。第2候補があるだけで、その場で慌てずに済みます。',
+      steps: ['本命の店を決める', '同じエリア・同じくらいの価格で第2候補を1つ探す', '両方を地図アプリの保存リストに入れる'],
+      tip: '地図アプリに「デート候補」などのリストを作っておくと、その場でさっと開けます。',
+      ng: ['本命1軒だけで、入れなかったらさまよう'],
+      enough: '第3候補までは要りません。2つあれば十分です。', trouble: 't-full' },
+    { id: 'pr-near', group: 'date', title: '1軒目の近くに「次」と「休憩」を探しておく',
+      why: '食事の後に「このあとどうする？」で止まると、間が空きます。近くに次の候補があると自然に流れます。',
+      steps: ['1軒目から歩いて5分以内のカフェ・バーを1つ', '座って休める場所（カフェ・公園・商業施設）を1つ', 'トイレのある場所を把握'],
+      say: ['「この近くに気になってたカフェあるんだけど、寄ってく？」'],
+      ng: ['食べ終わってから、その場でスマホで探し始める'], trouble: 't-no-plan' },
+    { id: 'pr-reserve', group: 'date', title: '予約するかどうかを決めておく',
+      why: '予約が必要な場面と、その場で自然に行く方がいい場面があります。前日までに決めておくと迷いません。',
+      steps: ['「判断のコツ：予約する？その場で行く？」で判断', '予約するなら、時間に余裕を持たせる', '予約しないなら、混む時間（19時前後）を外す'],
+      ng: ['予約が必要な日（週末夜・記念日）に何も決めていない'], judge: 'j-reserve' },
+    { id: 'pr-hours', group: 'date', title: '当日、営業時間と臨時休業を確認する',
+      why: '「行ったら閉まってた」は、事前確認でほぼ防げます。',
+      steps: ['当日の朝か、出かける前に店のSNS・公式サイトを見る', '地図アプリの営業時間も確認（ずれていることがある）', 'ラストオーダーの時間も見る'],
+      tip: '家を出る前の「スマホ・財布・鍵」の確認に、「店の営業」を足すだけです。',
+      trouble: 't-closed' },
+    { id: 'pr-route', group: 'date', title: '待ち合わせ場所と行き方を具体的に決める',
+      why: '「駅で」だけだと、改札や出口が違って会えないことがあります。',
+      steps: ['改札・出口・目印まで決める（「〇〇駅の東口改札を出たところ」）', '初めての店は、ストリートビューで入口を確認', '駅から店までの道順を一度見ておく'],
+      say: ['「〇〇駅の東口改札出たところで待ってるね」'],
+      ng: ['「駅着いたら連絡して」で、その場で探し合う'], trouble: 't-lost' },
+    { id: 'pr-meal-time', group: 'date', title: '食事と休憩のタイミングを決めておく',
+      why: '自分は空腹や疲れを我慢できても、相手は違います。自分の感覚を基準にすると、相手がつらくなります。',
+      steps: ['昼・夜の食事のだいたいの時間を決めておく（12時・18〜19時ごろ）', '1〜2時間歩いたら、座れる場所で休む予定を入れる', '軽く食べられる場所（カフェ・軽食）も把握'],
+      enough: '分刻みの予定は要りません。「このへんで食べる・休む」の目安だけで十分です。', kizukai: 'kz-hungry' },
+    { id: 'pr-weather', group: 'date', title: '天気を見て、雨の日の代案を1つ用意する',
+      why: '外のプランは天気に左右されます。代案があると、雨でも予定が崩れません。',
+      steps: ['前日と当日に天気予報を見る', '屋内の代案（映画・水族館・商業施設・カフェ）を1つ決める', '折りたたみ傘を持つ'], trouble: 't-rain' },
+    { id: 'pr-way-home', group: 'date', title: '帰り方・終電を確認しておく',
+      why: '楽しくて時間を忘れたときに、相手を困らせないためです。',
+      steps: ['自分と相手の終電の時間を調べる（相手には最初にさりげなく聞く）', 'その30分前を「そろそろ」の目安にする', 'タクシー代くらいは持っておく'],
+      say: ['「〇〇ちゃんって帰り何線？終電何時くらい？」'], trouble: 't-last-train' },
+    { id: 'pr-money', group: 'date', title: '支払い方法と、奢るか割り勘かを決めておく',
+      why: '会計のときにもたつくと、それまでの雰囲気が崩れます。',
+      steps: ['店の支払い方法（カード・電子マネー）を確認', '現金も少し持っておく', '奢るか割り勘かの方針を決めておく（判断のコツ参照）'], judge: 'j-pay', trouble: 't-bill' },
+    { id: 'pr-items', group: 'date', title: '持ち物を整える（ちょっとした備え）',
+      why: '「あったら助かる」ものを持っていると、相手が困ったときにもさっと出せます。',
+      steps: ['モバイルバッテリー', 'ハンカチ・ティッシュ', '絆創膏（靴ずれ用）', '折りたたみ傘', '少しの現金'],
+      tip: '小さいポーチにまとめて、いつものカバンに入れっぱなしにしておくと忘れません。',
+      ng: ['絆創膏や傘を「相手のために持ってきた」と恩着せがましく言う'] },
+    { id: 'pr-likes', group: 'date', title: '相手の好み・苦手を先に聞いておく',
+      why: '店選びや行き先で外しにくくなり、相手も「覚えててくれた」と感じます。',
+      steps: ['食べ物の好き・苦手・アレルギーを聞く', '行ってみたい場所を聞く', 'スマホのメモに残す'],
+      say: ['「苦手な食べ物とかある？」', '「最近行ってみたいとこある？」'], card: 'g-taste' },
+
+    // ===== 旅行・遠出 =====
+    { id: 'pr-trip-frame', group: 'travel', title: '旅程は「骨組み」から決める',
+      why: '細かいところから決めようとすると、まとまらずに疲れます。大きいものから順に決めると楽です。',
+      steps: ['① 日程と予算を決める', '② 行き先と移動手段（電車・車・飛行機）', '③ 宿（場所が決まると動きやすい）', '④ メインの目的を1日1〜2個', '⑤ 食事の候補（昼・夜）', '⑥ 残りは「余白」にする'],
+      tip: '相手に「これだけは行きたい」を1つずつ出してもらい、それをメインにすると決めやすいです。',
+      ng: ['分刻みのスケジュールを組む', '何も決めずに当日現地で考える'],
+      enough: '全部決めなくて大丈夫です。メインと宿と移動が決まっていれば、旅行は成立します。' },
+    { id: 'pr-trip-book', group: 'travel', title: '宿と移動は早めに予約する',
+      why: '連休・週末は宿も新幹線もすぐ埋まります。ここだけは早めが安心です。',
+      steps: ['日程が決まったら、まず宿と移動を押さえる', 'キャンセル無料期限を確認しておく', '予約確認メールをまとめて保存'],
+      ng: ['直前に探して、高い・遠い宿しか残っていない'] },
+    { id: 'pr-trip-pace', group: 'travel', title: '予定を詰めすぎない（移動と休憩を見積もる）',
+      why: '移動・待ち時間・休憩は思ったより時間がかかります。詰めすぎると、全部が中途半端になります。',
+      steps: ['移動時間は地図アプリの1.5倍で見積もる', '大きな予定は1日2つまで', '午後に1回、カフェなどで休む時間を入れる'],
+      enough: '予定が1つ減っても、ゆっくりできた方が満足度は高いことが多いです。' },
+    { id: 'pr-trip-share', group: 'travel', title: '旅程を相手と共有する',
+      why: '自分だけが把握していると、相手は不安になりますし、相談もできません。',
+      steps: ['メモアプリや共有ノートに旅程を書く', '地図アプリの保存リストを共有', '集合時間・場所・持ち物を前日に確認'],
+      say: ['「いちおう旅程まとめたから見といて。行きたいとこあったら足して」'] },
+    { id: 'pr-trip-plan-b', group: 'travel', title: '旅先の雨の日プラン・休業日を確認',
+      why: '遠出先で「休みだった」「雨で何もできない」は、取り返しがつきにくいです。',
+      steps: ['メインの場所の休業日・営業時間を調べる', '雨の日に行ける屋内スポットを1つ', '天気予報を前日に確認'] },
+
+    // ===== 飲み会・集まり =====
+    { id: 'pr-party-host', group: 'party', title: '幹事になったときの段取り',
+      why: '段取りができていると、当日は自分も楽しめます。',
+      steps: ['日程候補を出して調整（調整アプリが楽）', '人数が決まったら店を予約（個室・飲み放題・予算）', '会費を決めて事前に伝える', '前日に店の場所・時間をリマインド', '当日は集金方法（現金・送金アプリ）を決めておく'],
+      tip: '店選びに迷ったら、予約サイトで「個室・飲み放題・人数・予算」で絞り込むだけで候補が出ます。',
+      ng: ['店も会費も決まらないまま当日になる', '集金でもたつく'] },
+    { id: 'pr-party-cash', group: 'party', title: '会費・割り勘用の現金を用意する',
+      why: '飲み会は現金で集めることも多く、お釣りが出ないと幹事が困ります。',
+      steps: ['千円札を多めに持っていく', '送金アプリも使えるようにしておく'] },
+    { id: 'pr-party-know', group: 'party', title: '参加者の顔ぶれと席のことを考えておく',
+      why: '目上の人・初対面の人・あまり話さない人がいると分かっていれば、座る場所や話題を考えておけます。',
+      steps: ['誰が来るかを確認する', '目上の人がいるなら、上座・下座をざっくり知っておく', '話題を2つくらい考えておく'], kizukai: 'kz-seat' }
+  ]
+});
+
+</script>
+<script>
+/*
+ * 気づかいのさじ加減シリーズ
+ * ------------------------------------------------------------
+ * 「足りない」も「やりすぎ」もうまくいかない、ちょうどいい加減。
+ * 形式は js/series/README.md を参照。
+ * 【AI仮情報】本文はすべて AI が書いた仮の内容です。
+ */
+(window.SAITEIGEN_SERIES = window.SAITEIGEN_SERIES || []).push({
+  id: 'kizukai', name: '気づかいのさじ加減', icon: '🤝', origin: 'ai',
+  desc: '気づかいは「足りない」も「やりすぎ」もうまくいかない。自分基準で我慢させてしまう、逆に下に出すぎて仲良くなれない、など。',
+  fields: [
+    ['q', 'こんなこと、ない？', 'text'],
+    ['under', '🔻 足りないと', 'ul', 'kz-under'],
+    ['over', '🔺 やりすぎると', 'ul', 'kz-over'],
+    ['just', '⭕ ちょうどいいのは', 'ul', 'kz-just'],
+    ['say', '💬 言い方の例', 'bubble'],
+    ['tip', '🤫 こっそりのコツ', 'text', 'sneaky'],
+    ['enough', '✋ 気にしすぎなくていい', 'text', 'enough']
+  ],
+  groups: [
+    { id: 'two', name: '二人のとき・お出かけ', icon: '💑' },
+    { id: 'close', name: '距離感・会話', icon: '💬' },
+    { id: 'party', name: '飲み会・集まり', icon: '🍻' }
+  ],
+  items: [
+    // ===== 二人のとき・お出かけ =====
+    { id: 'kz-hungry', group: 'two', title: '相手のお腹のすき具合',
+      q: '自分は空腹を我慢できるから、気づいたら相手がずっとお腹をすかせていた。',
+      under: ['自分の感覚で食事を後回しにする', '「まだ大丈夫でしょ」と思い込む'],
+      over: ['「お腹すいてない？」を何度も聞く', '相手がまだなのに無理に食べさせる'],
+      just: ['時間で区切る（12時・18時前後に一度聞く）', '軽く食べられる場所を把握しておく', '自分がお腹すいたことにして誘う'],
+      say: ['「ちょっとお腹すいてきたかも。軽くなんか食べない？」', '「そろそろお昼にしよっか」'],
+      tip: '「自分がお腹すいた」と言えば、相手が空腹でも遠慮せず乗れます。',
+      enough: '毎回完璧に気づかなくて大丈夫。時間で一度聞くだけで十分です。', prep: 'pr-meal-time' },
+    { id: 'kz-tired', group: 'two', title: '相手の歩き疲れ',
+      q: '自分は平気で歩き続けて、相手が疲れているのに気づかなかった。',
+      under: ['休憩なしで歩き続ける', '相手の靴（ヒール・新しい靴）を見ていない', '歩くペースが速い'],
+      over: ['「疲れてない？」を何度も聞く', '少し歩いただけでタクシーを使おうとする'],
+      just: ['1時間に1回、座れる場所を挟む', '相手のペースに合わせて歩く', '相手の靴を見て、歩く量を調整する'],
+      say: ['「ちょっとそこ座って休まない？」', '「次、少し歩くけど大丈夫？タクシーでもいいよ」'],
+      tip: 'カフェ休憩を「計画の一部」にしておくと、聞かなくても自然に休めます。', trouble: 't-sick' },
+    { id: 'kz-toilet', group: 'two', title: 'トイレ休憩',
+      q: '相手がトイレに行きたいか分からず、言い出しにくそうだった。',
+      under: ['長時間トイレのない場所にいる', '移動前に確認しない'],
+      over: ['「トイレ大丈夫？」を何度も聞く（恥ずかしい）'],
+      just: ['店を出る前や長い移動の前に、自分から「トイレ行ってくる」と言う（相手も行きやすくなる）', 'トイレのある場所を把握しておく'],
+      say: ['「出る前にちょっとトイレ行ってくるね」'],
+      enough: '直接聞かなくても、自分が行くついでに声をかけるだけで十分です。' },
+    { id: 'kz-temp', group: 'two', title: '寒さ・暑さ',
+      q: '自分は平気だけど、相手は寒そう（暑そう）だった。',
+      under: ['寒い屋外に長くいる', '冷房の効いた店で薄着の相手に気づかない'],
+      over: ['自分の上着を無理に着せる'],
+      just: ['屋内に移動する・温かい飲み物を提案', '席を冷房の風が当たらない方にする', '上着を貸すなら「寒かったら使って」と差し出すだけ'],
+      say: ['「ちょっと寒くない？中入ろっか」'] },
+    { id: 'kz-weak', group: 'two', title: '相手を「弱い人」扱いしすぎる',
+      q: '大事にしようとして、何でもやってあげたり、心配しすぎたりしてしまう。',
+      under: ['重い荷物を持たせたまま気づかない', '危ない場所で気にかけない'],
+      over: ['何でも代わりにやろうとする', '「大丈夫？」を連発する', '相手ができることまで手を出す（子ども扱いに感じる人もいる）'],
+      just: ['相手を「対等な大人」として扱う', '本当に大変そうなとき（重い・危ない）だけ手を出す', '一度聞いて断られたら引く'],
+      say: ['「それ重そうだね、持とうか？」→断られたら「OK」で終わる'],
+      enough: '気づかいは「さりげなく1回」で十分。何度もやると、相手が気をつかいます。' },
+    { id: 'kz-bag', group: 'two', title: '荷物を持つ？持たない？',
+      q: 'どうでもいい小さな荷物まで持とうとして、ちょっと変な空気になった。',
+      under: ['大きな買い物袋・重い荷物を持たせっぱなし'],
+      over: ['小さなバッグ・手荷物まで持とうとする', '断られても何度も「持つよ」と言う'],
+      just: ['重い・かさばる物（買い物袋・お土産）だけ「持とうか？」', '相手の普段使いのバッグは持たない', '断られたらすぐ引く'],
+      say: ['「その袋、重かったら持つよ」'] },
+    { id: 'kz-sorry', group: 'two', title: '謝りすぎる',
+      q: '何かあるたびに「ごめん」「すみません」と言ってしまう。',
+      under: ['本当に悪いときに謝らない'],
+      over: ['小さなことでも何度も謝る（相手が「いいよ」と言い続けることになる）', '「すみません」が口ぐせ'],
+      just: ['謝るのは1回だけ', '「すみません」を「ありがとう」に変える（待ってもらった→「待っててくれてありがとう」）'],
+      say: ['「待っててくれてありがとう」', '「ごめん！」（1回でOK）'] },
+
+    // ===== 距離感・会話 =====
+    { id: 'kz-polite', group: 'close', title: '丁寧すぎる・下に出すぎる',
+      q: 'ずっと敬語・低姿勢で、相手との距離がいつまでも縮まらない。',
+      under: ['初対面からいきなりタメ口・なれなれしい'],
+      over: ['仲良くなりたい相手にずっと敬語', '自分を下げる言い方（「僕なんかが」）が多い', '何でも相手に合わせて、自分の意見を言わない'],
+      just: ['相手の口調に合わせて、少しずつ崩す（相手がタメ口になったら、こちらも少し崩す）', '名前で呼ぶ', '自分の好き・意見も少し言う'],
+      say: ['「敬語やめていい？」', '「〇〇さんって呼んでいい？」'],
+      tip: 'いきなり全部崩さなくて大丈夫。「〜ですよね」を「〜だよね」に1回変えるところから。', card: 'k-keigo' },
+    { id: 'kz-tsukkomi', group: 'close', title: 'ツッコミ・軽いいじりができない',
+      q: '相手のボケや自虐に全部真面目に返してしまい、ずっと距離が遠いまま。',
+      under: ['冗談を真面目に受け取る（「そうなんですね」で終わる）', '相手の自虐を本気でフォローしすぎる', 'リアクションが小さい'],
+      over: ['強くいじる・しつこくいじる', '見た目・体型・コンプレックスをいじる', '相手が笑っていないのに続ける'],
+      just: ['相手が自分からボケた・自虐したときだけ、軽く乗る', 'ツッコミは短く（「いや、それはないでしょ（笑）」）', '相手の言葉を拾って返す', '笑うときはちゃんと笑う'],
+      say: ['「いや、絶対そんなことないでしょ（笑）」', '「どういうこと（笑）」', '「それ、ちょっと分かる（笑）」'],
+      tip: 'まずは「ツッコむ」より「笑う」から。相手の冗談にちゃんと笑うだけで、距離はかなり縮まります。',
+      enough: '面白いことを言う必要はありません。相手の冗談に乗れれば十分です。' },
+    { id: 'kz-ask', group: 'close', title: '質問しすぎ・しなさすぎ',
+      q: '会話を続けようとして質問攻めにしてしまう／逆に何も聞けない。',
+      under: ['相手に興味がないように見える', '自分の話だけになる'],
+      over: ['尋問のように質問を続ける', 'プライベートに踏み込みすぎる'],
+      just: ['質問したら、相手の答えに自分の話を少し足す（質問→答え→自分の話→質問）', '答えやすい質問から'],
+      say: ['「休みの日って何してるの？」→答え→「いいね、自分は最近〇〇してて」'], card: 'k-listen' },
+    { id: 'kz-contact', group: 'close', title: '連絡の頻度・返信',
+      q: '連絡しすぎて重いかも／しなさすぎて冷たいかも、が分からない。',
+      under: ['会った後に何も送らない', '返信が数日後'],
+      over: ['返信を待たずに何通も送る', '既読がついたのに返信がないと催促する'],
+      just: ['相手のペース・文量に合わせる', '会った後は「今日はありがとう」を一言', '返信を急かさない'],
+      say: ['「今日ありがとう！楽しかった。また〇〇行こう」'], card: 'k-thanks' },
+    { id: 'kz-praise', group: 'close', title: '褒め方',
+      q: '褒めたいけど、照れて言えない／言いすぎて嘘っぽくなる。',
+      under: ['いいと思っても何も言わない'],
+      over: ['大げさに褒め続ける', '見た目ばかり褒める'],
+      just: ['具体的に1つ（「その色似合うね」）', '見た目より、選んだもの・やったことを褒める', '言ったら引きずらない'],
+      say: ['「その店選びのセンスいいね」', '「その服、雰囲気に合ってていいね」'] },
+
+    // ===== 飲み会・集まり =====
+    { id: 'kz-seat', group: 'party', title: '席（ハズレ席に同じ人をずっと座らせる）',
+      q: '通路側・端・注文係の席に、後輩や大人しい人がずっと座っていた。',
+      under: ['気まずい席・端の席にいる人に気づかない', '話に入れていない人を放っておく'],
+      over: ['席替えを仕切りすぎて、場が落ち着かない'],
+      just: ['自分が通路側・出入り口側・注文しやすい席に座る', '途中で「席替わろうか」と声をかける', '端の人に話を振る'],
+      say: ['「こっち座りなよ、そこ寒いでしょ」', '「〇〇はどう思う？」'],
+      tip: '自分から端や通路側に座っておくと、何も言わなくても他の人が楽になります。', prep: 'pr-party-know' },
+    { id: 'kz-pitcher', group: 'party', title: 'ピッチャー・お酌・取り分けでオドオドする',
+      q: 'ピッチャーや大皿のとき、注いでいいのか、どう注ぐのか分からずオドオドしてしまう。',
+      under: ['空いたグラスに気づかず、相手が手酌する', '大皿料理に誰も手をつけず冷める'],
+      over: ['全員のグラスを見張りすぎて、会話に参加しない', '断られているのに注ぎ続ける'],
+      just: ['空いているグラスを見たら「注ぎますね」と一言', '自分のグラスは最後', '大皿は「取り分けますね」と言って均等に', '断られたら「了解です」で引く'],
+      say: ['「〇〇さん、注ぎますね」', '「次、何飲みます？」', '「これ取り分けちゃいますね」'],
+      tip: 'ピッチャーは「グラスを少し傾けてもらって、ゆっくり注ぐ」だけで泡があふれにくいです。迷ったら「注いでいいですか？」と聞いてOK。',
+      enough: '完璧な作法は要りません。「気づいて一声かける」だけで十分です。' },
+    { id: 'kz-order', group: 'party', title: '注文・ラストオーダー',
+      q: '誰が注文するのか曖昧で、飲み物が空いたまま／ラストオーダーで慌てる。',
+      under: ['誰かがやってくれると思って何もしない'],
+      over: ['全部仕切って、他の人の希望を聞かない'],
+      just: ['空いたグラスを見て「何か頼みます？」とまとめて聞く', 'ラストオーダーの声がかかったら、全員に一言確認'],
+      say: ['「飲み物頼む人いますか？」', '「ラストオーダーだって、何かいる？」'] },
+    { id: 'kz-left-out', group: 'party', title: '話に入れていない人',
+      q: '盛り上がっているけど、一人だけ話に入れていない人がいる。',
+      under: ['内輪の話だけで盛り上がる'],
+      over: ['急に大げさに話を振って、注目を集めてしまう'],
+      just: ['その人が答えやすい話題で軽く振る', '内輪ネタには一言補足を入れる'],
+      say: ['「〇〇さんはこういうの好き？」', '「あ、これ前に〇〇があってさ」（補足）'] },
+    { id: 'kz-toast', group: 'party', title: '乾杯・目上の人との振る舞い',
+      q: '目上の人がいるとき、どう振る舞えばいいか分からず固まる。',
+      under: ['乾杯を待たずに飲み始める'],
+      over: ['ずっと気をつかって、自分が全く楽しめていない'],
+      just: ['乾杯までは飲み始めない', '乾杯のグラスは相手より少し下に', 'あとは普通に会話を楽しむ'],
+      enough: '細かい作法を知らなくても、乾杯を待つ・お礼を言う、ができれば十分です。' },
+    { id: 'kz-leave', group: 'party', title: '帰るタイミング・二次会の断り方',
+      q: '帰りたいけど言い出せない／二次会を断ると感じが悪いかも。',
+      under: ['何も言わずに消える'],
+      over: ['理由を長々と説明する'],
+      just: ['一次会の終わりに「今日はここで失礼します。ありがとうございました」', '幹事にお礼を言う'],
+      say: ['「明日早いので、今日はここで。ありがとうございました！」'] }
+  ]
+});
+
+</script>
+<script>
 /* 大人の身だしなみ・生活力向上アプリ — 本体
  * ビルド不要。データはすべてこの端末の localStorage に保存されます。 */
 (function () {
@@ -2023,7 +2299,7 @@ window.SAITEIGEN_JUDGE = {
         '<button class="link small" data-act="onboarded">閉じる</button></div>';
     }
 
-    html += '<a class="sos-btn" href="#/sos">🆘 いま困ってる（トラブル対処）</a>';
+    html += seg([['#/home', '今日やること'], ['#/habits', '習慣の一覧・編集']], '#/home');
     html += '<section><h2>今日のタスク <span class="count">' + doneCount + '/' + due.length + '</span></h2>';
     if (due.length || maint.length) {
       html += '<ul class="list">' + due.map(habitRow).join('') +
@@ -2227,7 +2503,7 @@ window.SAITEIGEN_JUDGE = {
   views.habits = function () {
     const groups = Object.keys(D.freqLabels);
     const act = S.habits.filter(h => h.active !== false);
-    let html = header('習慣') + '<p class="lead">頻度は項目ごとに変更できます。完了すると次回予定が自動で計算されます。</p>' +
+    let html = header('今日') + seg([['#/home', '今日やること'], ['#/habits', '習慣の一覧・編集']], '#/habits') + '<p class="lead">頻度は項目ごとに変更できます。完了すると次回予定が自動で計算されます。</p>' +
       '<div class="actions"><button class="btn primary" data-act="new-habit">＋ 習慣を追加</button></div>';
     groups.forEach(g => {
       const hs = act.filter(h => h.freq === g);
@@ -2417,7 +2693,7 @@ window.SAITEIGEN_JUDGE = {
 
   views.ng = function (area) {
     const cards = visibleCards().filter(c => c.ng && c.ng.length);
-    let html = header('うわっと思われがち集', '#/map') +
+    let html = header('うわっと思われがち集', '#/scene') +
       '<p class="lead">やりすぎ・やりがちで「うわ」と思われやすいポイントです。足りないより、やりすぎの方が目立つ場合もあります。' + AI_BADGE + '</p>' +
       seg([['#/ng', 'すべて']].concat(MAP.areas.map(a => ['#/ng?a=' + a.id, a.name])), area ? '#/ng?a=' + area : '#/ng');
     const areas = area && areaMap[area] ? [areaMap[area]] : MAP.areas;
@@ -2511,7 +2787,7 @@ window.SAITEIGEN_JUDGE = {
   TR.cases.forEach(t => { trMap[t.id] = t; });
 
   views.sos = function () {
-    let html = header('トラブル対処', '#/map') +
+    let html = header('トラブル対処', '#/scene') +
       '<p class="lead">二人でいるとき、予定どおりにいかなかったときの対処です。その場で開いて使ってください。' + (TR.origin === 'ai' ? ' ' + AI_BADGE : '') + '</p>' +
       '<a class="card cta" href="#/judge"><strong>🤔 判断のコツ（出かける前に）</strong><span class="sub">予約する？その場で行く？ 奢る？割り勘？ など</span></a>' +
       '<details class="card principles"><summary><strong>困ったときの5原則</strong> <span class="sub">（タップで開く）</span></summary><ol>' +
@@ -2540,7 +2816,9 @@ window.SAITEIGEN_JUDGE = {
     if (t.prep && t.prep.length) html += sec('tr-prep', '🧭 次から備える', '<ul class="ngl">' + t.prep.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>');
     html += '<section><h2>📝 自分メモ</h2><div class="card"><p class="sub" style="margin:0 0 6px">実際にあったこと・次はこうする、など。この端末にだけ保存されます。</p>' +
       '<textarea class="memo" data-memo="' + t.id + '" rows="4" placeholder="例：〇〇駅の△△は週末満席。次は予約する">' + esc(note) + '</textarea></div></section>';
-    if (t.card && cardMap[t.card]) html += '<ul class="list" style="margin-top:16px"><li><a class="row" href="#/card/' + t.card + '"><span class="ico">🗺️</span><div class="grow"><div>関連：' + esc(cardMap[t.card].title) + '</div></div><span class="chev">›</span></a></li></ul>';
+    // このトラブルを参照している準備・さじ加減
+    const refs = SERIES.flatMap(sr => sr.items.filter(x => x.trouble === t.id).map(x => '<li><a class="row" href="#/s/' + sr.id + '/' + x.id + '"><span class="ico">' + sr.icon + '</span><div class="grow">' + esc(sr.name) + '：' + esc(x.title) + '</div><span class="chev">›</span></a></li>'));
+    html += relatedLinks({ card: t.card }).replace('</ul></section>', refs.join('') + '</ul></section>') || (refs.length ? '<section><h2>関連</h2><ul class="list">' + refs.join('') + '</ul></section>' : '');
     return html;
   };
 
@@ -2548,7 +2826,7 @@ window.SAITEIGEN_JUDGE = {
   // ---------- 判断のコツ ----------
   const JG = window.SAITEIGEN_JUDGE || { guides: [] };
   views.judge = function () {
-    return header('判断のコツ', '#/sos') +
+    return header('判断のコツ', '#/scene') +
       '<p class="lead">「予約しておく」と「その場で自然に」のように、場面で正解が変わる判断のヒントです。' + (JG.origin === 'ai' ? ' ' + AI_BADGE : '') + '</p>' +
       '<ul class="list">' + JG.guides.map(g => '<li><a class="row" href="#/guide/' + g.id + '"><span class="ico">' + g.icon + '</span><div class="grow"><div>' + esc(g.title) + '</div><div class="sub">' + esc(g.q) + '</div></div><span class="chev">›</span></a></li>').join('') + '</ul>';
   };
@@ -2565,6 +2843,82 @@ window.SAITEIGEN_JUDGE = {
       side(g.a, 'side-a') + side(g.b, 'side-b') +
       (g.mid && g.mid.length ? '<div class="card tr-prep"><div class="sub">🤝 中間の選択肢</div><ul class="ngl">' + g.mid.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>' : '') +
       (g.ng && g.ng.length ? '<div class="card ng"><div class="sub">⚠️ どちらでもNGになりがち</div><ul class="ngl">' + g.ng.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>' : '');
+  };
+
+
+  // ---------- シーン（事前準備・さじ加減など、シリーズの汎用表示） ----------
+  const SERIES = window.SAITEIGEN_SERIES || [];
+  const seriesMap = {};
+  const seriesItem = {};
+  SERIES.forEach(sr => { seriesMap[sr.id] = sr; sr.items.forEach(it => { seriesItem[it.id] = { sr, it }; }); });
+  function noteBox(id) {
+    const note = (S.troubleNotes || {})[id] || '';
+    return '<section><h2>📝 自分メモ</h2><div class="card"><p class="sub" style="margin:0 0 6px">実際にあったこと・次はこうする、など。この端末にだけ保存されます。</p>' +
+      '<textarea class="memo" data-memo="' + id + '" rows="3" placeholder="自由にメモ">' + esc(note) + '</textarea></div></section>';
+  }
+  // 関連リンク（シリーズ同士・トラブル・判断・マップをつなぐ）
+  function relatedLinks(x) {
+    const out = [];
+    const add = (href, icon, label) => out.push('<li><a class="row" href="' + href + '"><span class="ico">' + icon + '</span><div class="grow">' + esc(label) + '</div><span class="chev">›</span></a></li>');
+    if (x.prep && seriesItem[x.prep]) add('#/s/prep/' + x.prep, '🧭', '事前準備：' + seriesItem[x.prep].it.title);
+    if (x.kizukai && seriesItem[x.kizukai]) add('#/s/kizukai/' + x.kizukai, '🤝', 'さじ加減：' + seriesItem[x.kizukai].it.title);
+    if (x.trouble && trMap[x.trouble]) add('#/trouble/' + x.trouble, '🆘', 'トラブル：' + trMap[x.trouble].title);
+    if (x.judge && JG.guides.find(g => g.id === x.judge)) add('#/guide/' + x.judge, '🤔', '判断のコツ：' + JG.guides.find(g => g.id === x.judge).title);
+    if (x.card && cardMap[x.card]) add('#/card/' + x.card, '🗺️', 'マップ：' + cardMap[x.card].title);
+    return out.length ? '<section><h2>関連</h2><ul class="list">' + out.join('') + '</ul></section>' : '';
+  }
+
+  views.scene = function () {
+    const tile = (href, icon, name, desc, n) => '<a class="card scene-tile" href="' + href + '"><span class="ico big">' + icon + '</span><div class="grow"><strong>' + esc(name) +
+      (n ? ' <span class="badge">' + n + '件</span>' : '') + '</strong><span class="sub">' + esc(desc) + '</span></div><span class="chev">›</span></a>';
+    return '<header class="hero"><div class="sub">スマートな人が自然にやっていること</div><h1>シーン</h1></header>' +
+      '<a class="sos-btn" href="#/sos">🆘 いま困ってる（トラブル対処）</a>' +
+      '<section><h2>出かける前に</h2>' +
+      SERIES.filter(sr => sr.id === 'prep').map(sr => tile('#/s/' + sr.id, sr.icon, sr.name, sr.desc, sr.items.length)).join('') +
+      tile('#/judge', '🤔', '判断のコツ', '予約する？その場で行く？ 奢る？割り勘？ 正解が場面で変わること', JG.guides.length) + '</section>' +
+      '<section><h2>その場で</h2>' +
+      SERIES.filter(sr => sr.id !== 'prep').map(sr => tile('#/s/' + sr.id, sr.icon, sr.name, sr.desc, sr.items.length)).join('') +
+      tile('#/sos', '🆘', 'トラブル対処', '満席・休み・ホテル満室・沈黙・終電・事故など', TR.cases.length) +
+      tile('#/ng', '⚠️', 'うわっと思われがち集', 'やりすぎ・やりがちなこと', '') + '</section>' +
+      '<p class="sub center" style="margin-top:16px">' + AI_BADGE + ' 内容はすべてAIが作成した仮の文章です。</p>';
+  };
+
+  views.s = function (sid, iid) {
+    const sr = seriesMap[sid];
+    if (!sr) return notFound();
+    if (!iid) {
+      let html = header(sr.icon + ' ' + sr.name, '#/scene') + '<p class="lead">' + esc(sr.desc) + (sr.origin === 'ai' ? ' ' + AI_BADGE : '') + '</p>';
+      sr.groups.forEach(g => {
+        const its = sr.items.filter(it => it.group === g.id);
+        if (!its.length) return;
+        html += '<section><h2>' + g.icon + ' ' + esc(g.name) + '</h2><ul class="list">' + its.map(it =>
+          '<li><a class="row" href="#/s/' + sr.id + '/' + it.id + '"><div class="grow">' + esc(it.title) +
+          ((S.troubleNotes || {})[it.id] ? '<div class="sub">📝 メモあり</div>' : '') + '</div><span class="chev">›</span></a></li>').join('') + '</ul></section>';
+      });
+      return html;
+    }
+    const it = sr.items.find(x => x.id === iid);
+    if (!it) return notFound();
+    const g = sr.groups.find(x => x.id === it.group) || { icon: '', name: '' };
+    let html = header(sr.icon + ' ' + sr.name, '#/s/' + sr.id) +
+      '<div class="sub">' + g.icon + ' ' + esc(g.name) + '</div>' +
+      '<h1 class="ctitle">' + esc(it.title) + '</h1>' + (sr.origin === 'ai' ? '<div class="cardhead">' + AI_BADGE + '</div>' : '');
+    sr.fields.forEach(([key, label, type, cls]) => {
+      const v = it[key];
+      if (!v || (Array.isArray(v) && !v.length)) return;
+      let body;
+      if (type === 'ol') body = '<ol class="how">' + v.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol>';
+      else if (type === 'ul') body = '<ul class="ngl">' + v.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+      else if (type === 'bubble') body = v.map(x => '<p class="bubble">' + esc(x) + '</p>').join('');
+      else body = '<p>' + esc(v) + '</p>';
+      html += '<div class="card ' + (cls || '') + '"><div class="sub">' + esc(label) + '</div>' + body + '</div>';
+    });
+    html += noteBox(it.id) + relatedLinks(it);
+    const list = sr.items;
+    const i = list.indexOf(it);
+    html += '<div class="pager">' + (i > 0 ? '<a href="#/s/' + sr.id + '/' + list[i - 1].id + '">‹ ' + esc(list[i - 1].title) + '</a>' : '<span></span>') +
+      (i < list.length - 1 ? '<a href="#/s/' + sr.id + '/' + list[i + 1].id + '">' + esc(list[i + 1].title) + ' ›</a>' : '<span></span>') + '</div>';
+    return html;
   };
 
   // ---------- フォーム ----------
@@ -2809,13 +3163,13 @@ window.SAITEIGEN_JUDGE = {
   function render() {
     const hash = location.hash || '#/map';
     const [path, query] = hash.slice(2).split('?');
-    const [name, arg] = path.split('/');
+    const [name, arg, arg2] = path.split('/');
     const params = new URLSearchParams(query || '');
     const fn = views[name] || views.map;
     const y = window.scrollY;
-    $app.innerHTML = fn(name === 'learn' ? params.get('q') : (name === 'map' || name === 'ng') ? params.get('a') : arg);
-    const tab = { judge: 'map', guide: 'map', sos: 'map', trouble: 'map', ng: 'map', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
-      habits: 'habits', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'map';
+    $app.innerHTML = fn(name === 'learn' ? params.get('q') : (name === 'map' || name === 'ng') ? params.get('a') : arg, arg2);
+    const tab = { scene: 'scene', s: 'scene', judge: 'scene', guide: 'scene', sos: 'scene', trouble: 'scene', ng: 'scene', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
+      habits: 'home', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'map';
     document.querySelectorAll('.tabbar a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
     if (hash !== lastRoute) window.scrollTo(0, 0); else window.scrollTo(0, y);
     lastRoute = hash;

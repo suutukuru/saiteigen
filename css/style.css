@@ -294,3 +294,11 @@ li.row { padding: 10px 14px; }
 .point { border-left: 4px solid var(--accent); }
 .side-a { border-top: 4px solid var(--lv2); }
 .side-b { border-top: 4px solid var(--lv3); }
+
+/* ---- シーン ---- */
+.scene-tile { display: flex; align-items: center; gap: 12px; color: var(--text); }
+.scene-tile strong { display: block; }
+.scene-tile .sub { display: block; margin-top: 2px; }
+.kz-under { border-left: 4px solid #3b82c4; }
+.kz-over { border-left: 4px solid var(--lv1); }
+.kz-just { border-left: 4px solid var(--ok); background: var(--ok-soft); }

@@ -284,7 +284,7 @@
         '<button class="link small" data-act="onboarded">閉じる</button></div>';
     }
 
-    html += '<a class="sos-btn" href="#/sos">🆘 いま困ってる（トラブル対処）</a>';
+    html += seg([['#/home', '今日やること'], ['#/habits', '習慣の一覧・編集']], '#/home');
     html += '<section><h2>今日のタスク <span class="count">' + doneCount + '/' + due.length + '</span></h2>';
     if (due.length || maint.length) {
       html += '<ul class="list">' + due.map(habitRow).join('') +
@@ -488,7 +488,7 @@
   views.habits = function () {
     const groups = Object.keys(D.freqLabels);
     const act = S.habits.filter(h => h.active !== false);
-    let html = header('習慣') + '<p class="lead">頻度は項目ごとに変更できます。完了すると次回予定が自動で計算されます。</p>' +
+    let html = header('今日') + seg([['#/home', '今日やること'], ['#/habits', '習慣の一覧・編集']], '#/habits') + '<p class="lead">頻度は項目ごとに変更できます。完了すると次回予定が自動で計算されます。</p>' +
       '<div class="actions"><button class="btn primary" data-act="new-habit">＋ 習慣を追加</button></div>';
     groups.forEach(g => {
       const hs = act.filter(h => h.freq === g);
@@ -678,7 +678,7 @@
 
   views.ng = function (area) {
     const cards = visibleCards().filter(c => c.ng && c.ng.length);
-    let html = header('うわっと思われがち集', '#/map') +
+    let html = header('うわっと思われがち集', '#/scene') +
       '<p class="lead">やりすぎ・やりがちで「うわ」と思われやすいポイントです。足りないより、やりすぎの方が目立つ場合もあります。' + AI_BADGE + '</p>' +
       seg([['#/ng', 'すべて']].concat(MAP.areas.map(a => ['#/ng?a=' + a.id, a.name])), area ? '#/ng?a=' + area : '#/ng');
     const areas = area && areaMap[area] ? [areaMap[area]] : MAP.areas;
@@ -772,7 +772,7 @@
   TR.cases.forEach(t => { trMap[t.id] = t; });
 
   views.sos = function () {
-    let html = header('トラブル対処', '#/map') +
+    let html = header('トラブル対処', '#/scene') +
       '<p class="lead">二人でいるとき、予定どおりにいかなかったときの対処です。その場で開いて使ってください。' + (TR.origin === 'ai' ? ' ' + AI_BADGE : '') + '</p>' +
       '<a class="card cta" href="#/judge"><strong>🤔 判断のコツ（出かける前に）</strong><span class="sub">予約する？その場で行く？ 奢る？割り勘？ など</span></a>' +
       '<details class="card principles"><summary><strong>困ったときの5原則</strong> <span class="sub">（タップで開く）</span></summary><ol>' +
@@ -801,7 +801,9 @@
     if (t.prep && t.prep.length) html += sec('tr-prep', '🧭 次から備える', '<ul class="ngl">' + t.prep.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>');
     html += '<section><h2>📝 自分メモ</h2><div class="card"><p class="sub" style="margin:0 0 6px">実際にあったこと・次はこうする、など。この端末にだけ保存されます。</p>' +
       '<textarea class="memo" data-memo="' + t.id + '" rows="4" placeholder="例：〇〇駅の△△は週末満席。次は予約する">' + esc(note) + '</textarea></div></section>';
-    if (t.card && cardMap[t.card]) html += '<ul class="list" style="margin-top:16px"><li><a class="row" href="#/card/' + t.card + '"><span class="ico">🗺️</span><div class="grow"><div>関連：' + esc(cardMap[t.card].title) + '</div></div><span class="chev">›</span></a></li></ul>';
+    // このトラブルを参照している準備・さじ加減
+    const refs = SERIES.flatMap(sr => sr.items.filter(x => x.trouble === t.id).map(x => '<li><a class="row" href="#/s/' + sr.id + '/' + x.id + '"><span class="ico">' + sr.icon + '</span><div class="grow">' + esc(sr.name) + '：' + esc(x.title) + '</div><span class="chev">›</span></a></li>'));
+    html += relatedLinks({ card: t.card }).replace('</ul></section>', refs.join('') + '</ul></section>') || (refs.length ? '<section><h2>関連</h2><ul class="list">' + refs.join('') + '</ul></section>' : '');
     return html;
   };
 
@@ -809,7 +811,7 @@
   // ---------- 判断のコツ ----------
   const JG = window.SAITEIGEN_JUDGE || { guides: [] };
   views.judge = function () {
-    return header('判断のコツ', '#/sos') +
+    return header('判断のコツ', '#/scene') +
       '<p class="lead">「予約しておく」と「その場で自然に」のように、場面で正解が変わる判断のヒントです。' + (JG.origin === 'ai' ? ' ' + AI_BADGE : '') + '</p>' +
       '<ul class="list">' + JG.guides.map(g => '<li><a class="row" href="#/guide/' + g.id + '"><span class="ico">' + g.icon + '</span><div class="grow"><div>' + esc(g.title) + '</div><div class="sub">' + esc(g.q) + '</div></div><span class="chev">›</span></a></li>').join('') + '</ul>';
   };
@@ -826,6 +828,82 @@
       side(g.a, 'side-a') + side(g.b, 'side-b') +
       (g.mid && g.mid.length ? '<div class="card tr-prep"><div class="sub">🤝 中間の選択肢</div><ul class="ngl">' + g.mid.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>' : '') +
       (g.ng && g.ng.length ? '<div class="card ng"><div class="sub">⚠️ どちらでもNGになりがち</div><ul class="ngl">' + g.ng.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>' : '');
+  };
+
+
+  // ---------- シーン（事前準備・さじ加減など、シリーズの汎用表示） ----------
+  const SERIES = window.SAITEIGEN_SERIES || [];
+  const seriesMap = {};
+  const seriesItem = {};
+  SERIES.forEach(sr => { seriesMap[sr.id] = sr; sr.items.forEach(it => { seriesItem[it.id] = { sr, it }; }); });
+  function noteBox(id) {
+    const note = (S.troubleNotes || {})[id] || '';
+    return '<section><h2>📝 自分メモ</h2><div class="card"><p class="sub" style="margin:0 0 6px">実際にあったこと・次はこうする、など。この端末にだけ保存されます。</p>' +
+      '<textarea class="memo" data-memo="' + id + '" rows="3" placeholder="自由にメモ">' + esc(note) + '</textarea></div></section>';
+  }
+  // 関連リンク（シリーズ同士・トラブル・判断・マップをつなぐ）
+  function relatedLinks(x) {
+    const out = [];
+    const add = (href, icon, label) => out.push('<li><a class="row" href="' + href + '"><span class="ico">' + icon + '</span><div class="grow">' + esc(label) + '</div><span class="chev">›</span></a></li>');
+    if (x.prep && seriesItem[x.prep]) add('#/s/prep/' + x.prep, '🧭', '事前準備：' + seriesItem[x.prep].it.title);
+    if (x.kizukai && seriesItem[x.kizukai]) add('#/s/kizukai/' + x.kizukai, '🤝', 'さじ加減：' + seriesItem[x.kizukai].it.title);
+    if (x.trouble && trMap[x.trouble]) add('#/trouble/' + x.trouble, '🆘', 'トラブル：' + trMap[x.trouble].title);
+    if (x.judge && JG.guides.find(g => g.id === x.judge)) add('#/guide/' + x.judge, '🤔', '判断のコツ：' + JG.guides.find(g => g.id === x.judge).title);
+    if (x.card && cardMap[x.card]) add('#/card/' + x.card, '🗺️', 'マップ：' + cardMap[x.card].title);
+    return out.length ? '<section><h2>関連</h2><ul class="list">' + out.join('') + '</ul></section>' : '';
+  }
+
+  views.scene = function () {
+    const tile = (href, icon, name, desc, n) => '<a class="card scene-tile" href="' + href + '"><span class="ico big">' + icon + '</span><div class="grow"><strong>' + esc(name) +
+      (n ? ' <span class="badge">' + n + '件</span>' : '') + '</strong><span class="sub">' + esc(desc) + '</span></div><span class="chev">›</span></a>';
+    return '<header class="hero"><div class="sub">スマートな人が自然にやっていること</div><h1>シーン</h1></header>' +
+      '<a class="sos-btn" href="#/sos">🆘 いま困ってる（トラブル対処）</a>' +
+      '<section><h2>出かける前に</h2>' +
+      SERIES.filter(sr => sr.id === 'prep').map(sr => tile('#/s/' + sr.id, sr.icon, sr.name, sr.desc, sr.items.length)).join('') +
+      tile('#/judge', '🤔', '判断のコツ', '予約する？その場で行く？ 奢る？割り勘？ 正解が場面で変わること', JG.guides.length) + '</section>' +
+      '<section><h2>その場で</h2>' +
+      SERIES.filter(sr => sr.id !== 'prep').map(sr => tile('#/s/' + sr.id, sr.icon, sr.name, sr.desc, sr.items.length)).join('') +
+      tile('#/sos', '🆘', 'トラブル対処', '満席・休み・ホテル満室・沈黙・終電・事故など', TR.cases.length) +
+      tile('#/ng', '⚠️', 'うわっと思われがち集', 'やりすぎ・やりがちなこと', '') + '</section>' +
+      '<p class="sub center" style="margin-top:16px">' + AI_BADGE + ' 内容はすべてAIが作成した仮の文章です。</p>';
+  };
+
+  views.s = function (sid, iid) {
+    const sr = seriesMap[sid];
+    if (!sr) return notFound();
+    if (!iid) {
+      let html = header(sr.icon + ' ' + sr.name, '#/scene') + '<p class="lead">' + esc(sr.desc) + (sr.origin === 'ai' ? ' ' + AI_BADGE : '') + '</p>';
+      sr.groups.forEach(g => {
+        const its = sr.items.filter(it => it.group === g.id);
+        if (!its.length) return;
+        html += '<section><h2>' + g.icon + ' ' + esc(g.name) + '</h2><ul class="list">' + its.map(it =>
+          '<li><a class="row" href="#/s/' + sr.id + '/' + it.id + '"><div class="grow">' + esc(it.title) +
+          ((S.troubleNotes || {})[it.id] ? '<div class="sub">📝 メモあり</div>' : '') + '</div><span class="chev">›</span></a></li>').join('') + '</ul></section>';
+      });
+      return html;
+    }
+    const it = sr.items.find(x => x.id === iid);
+    if (!it) return notFound();
+    const g = sr.groups.find(x => x.id === it.group) || { icon: '', name: '' };
+    let html = header(sr.icon + ' ' + sr.name, '#/s/' + sr.id) +
+      '<div class="sub">' + g.icon + ' ' + esc(g.name) + '</div>' +
+      '<h1 class="ctitle">' + esc(it.title) + '</h1>' + (sr.origin === 'ai' ? '<div class="cardhead">' + AI_BADGE + '</div>' : '');
+    sr.fields.forEach(([key, label, type, cls]) => {
+      const v = it[key];
+      if (!v || (Array.isArray(v) && !v.length)) return;
+      let body;
+      if (type === 'ol') body = '<ol class="how">' + v.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol>';
+      else if (type === 'ul') body = '<ul class="ngl">' + v.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+      else if (type === 'bubble') body = v.map(x => '<p class="bubble">' + esc(x) + '</p>').join('');
+      else body = '<p>' + esc(v) + '</p>';
+      html += '<div class="card ' + (cls || '') + '"><div class="sub">' + esc(label) + '</div>' + body + '</div>';
+    });
+    html += noteBox(it.id) + relatedLinks(it);
+    const list = sr.items;
+    const i = list.indexOf(it);
+    html += '<div class="pager">' + (i > 0 ? '<a href="#/s/' + sr.id + '/' + list[i - 1].id + '">‹ ' + esc(list[i - 1].title) + '</a>' : '<span></span>') +
+      (i < list.length - 1 ? '<a href="#/s/' + sr.id + '/' + list[i + 1].id + '">' + esc(list[i + 1].title) + ' ›</a>' : '<span></span>') + '</div>';
+    return html;
   };
 
   // ---------- フォーム ----------
@@ -1070,13 +1148,13 @@
   function render() {
     const hash = location.hash || '#/map';
     const [path, query] = hash.slice(2).split('?');
-    const [name, arg] = path.split('/');
+    const [name, arg, arg2] = path.split('/');
     const params = new URLSearchParams(query || '');
     const fn = views[name] || views.map;
     const y = window.scrollY;
-    $app.innerHTML = fn(name === 'learn' ? params.get('q') : (name === 'map' || name === 'ng') ? params.get('a') : arg);
-    const tab = { judge: 'map', guide: 'map', sos: 'map', trouble: 'map', ng: 'map', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
-      habits: 'habits', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'map';
+    $app.innerHTML = fn(name === 'learn' ? params.get('q') : (name === 'map' || name === 'ng') ? params.get('a') : arg, arg2);
+    const tab = { scene: 'scene', s: 'scene', judge: 'scene', guide: 'scene', sos: 'scene', trouble: 'scene', ng: 'scene', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
+      habits: 'home', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'map';
     document.querySelectorAll('.tabbar a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
     if (hash !== lastRoute) window.scrollTo(0, 0); else window.scrollTo(0, y);
     lastRoute = hash;
