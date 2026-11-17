@@ -858,6 +858,7 @@
     const out = [];
     const add = (href, icon, label) => out.push('<li><a class="row" href="' + href + '"><span class="ico">' + icon + '</span><div class="grow">' + esc(label) + '</div><span class="chev">›</span></a></li>');
     if (x.prep && seriesItem[x.prep]) add('#/s/prep/' + x.prep, '🧭', '事前準備：' + seriesItem[x.prep].it.title);
+    if (x.shigoto && seriesItem[x.shigoto]) add('#/s/shigoto/' + x.shigoto, '💼', '職場：' + seriesItem[x.shigoto].it.title);
     if (x.nakayoku && seriesItem[x.nakayoku]) add('#/s/nakayoku/' + x.nakayoku, '🫂', '仲良くなる：' + seriesItem[x.nakayoku].it.title);
     if (x.kizukai && seriesItem[x.kizukai]) add('#/s/kizukai/' + x.kizukai, '🤝', 'さじ加減：' + seriesItem[x.kizukai].it.title);
     if (x.trouble && trMap[x.trouble]) add('#/trouble/' + x.trouble, '🆘', 'トラブル：' + trMap[x.trouble].title);

@@ -3,7 +3,7 @@
 const path = require('path');
 global.window = {};
 const root = path.join(__dirname, '..');
-['js/data.js', 'js/content.js', 'js/ai-draft/01-05.js', 'js/ai-draft/06-10.js', 'js/ai-draft/11-14.js', 'js/map.js', 'js/trouble.js', 'js/judge.js', 'js/series/prep.js', 'js/series/kizukai.js', 'js/series/nakayoku.js']
+['js/data.js', 'js/content.js', 'js/ai-draft/01-05.js', 'js/ai-draft/06-10.js', 'js/ai-draft/11-14.js', 'js/map.js', 'js/trouble.js', 'js/judge.js', 'js/series/prep.js', 'js/series/kizukai.js', 'js/series/nakayoku.js', 'js/series/shigoto.js']
   .forEach(f => require(path.join(root, f)));
 const D = window.SAITEIGEN_DATA, C = window.SAITEIGEN_CONTENT, A = window.SAITEIGEN_AI_DRAFT, M = window.SAITEIGEN_MAP;
 const items = D.categories.flatMap(c => c.items.map(i => Object.assign({ cat: c.no + ' ' + c.name }, i)));
