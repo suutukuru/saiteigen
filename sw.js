@@ -1,9 +1,9 @@
 /* オフライン用キャッシュ。ファイルを更新したら VERSION を上げてください。 */
-const VERSION = 'v0.6.0';
+const VERSION = 'v0.7.0';
 const CACHE = 'saiteigen-' + VERSION;
 const ASSETS = [
   './', './index.html', './css/style.css',
-  './js/data.js', './js/content.js', './js/map.js', './js/trouble.js', './js/ai-draft/01-05.js', './js/ai-draft/06-10.js', './js/ai-draft/11-14.js', './js/app.js',
+  './js/data.js', './js/content.js', './js/map.js', './js/trouble.js', './js/judge.js', './js/ai-draft/01-05.js', './js/ai-draft/06-10.js', './js/ai-draft/11-14.js', './js/app.js',
   './manifest.webmanifest', './icons/icon.svg', './icons/apple-touch-icon.png',
   './icons/icon-192.png', './icons/icon-512.png'
 ];

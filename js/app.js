@@ -774,6 +774,7 @@
   views.sos = function () {
     let html = header('トラブル対処', '#/map') +
       '<p class="lead">二人でいるとき、予定どおりにいかなかったときの対処です。その場で開いて使ってください。' + (TR.origin === 'ai' ? ' ' + AI_BADGE : '') + '</p>' +
+      '<a class="card cta" href="#/judge"><strong>🤔 判断のコツ（出かける前に）</strong><span class="sub">予約する？その場で行く？ 奢る？割り勘？ など</span></a>' +
       '<details class="card principles"><summary><strong>困ったときの5原則</strong> <span class="sub">（タップで開く）</span></summary><ol>' +
       TR.principles.map(p => '<li><strong>' + esc(p.t) + '</strong><span class="sub">' + esc(p.d) + '</span></li>').join('') + '</ol></details>';
     TR.groups.forEach(g => {
@@ -793,6 +794,7 @@
     const sec = (cls, title, body) => '<div class="card ' + cls + '"><div class="sub">' + title + '</div>' + body + '</div>';
     let html = header(g.icon + ' ' + g.name, '#/sos') +
       '<h1 class="ctitle">' + esc(t.title) + '</h1>' + (TR.origin === 'ai' ? '<div class="cardhead">' + AI_BADGE + '</div>' : '') +
+      (t.safety ? '<div class="notice"><strong>安全・法律に関わる内容です。</strong>人命と安全を最優先に、警察・消防・保険会社の指示に従ってください。</div>' : '') +
       sec('tr-now', '🚑 まずこれ', '<ol class="how">' + t.now.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol>');
     if (t.say && t.say.length) html += sec('tr-say', '💬 言い方の例', t.say.map(x => '<p class="bubble">' + esc(x) + '</p>').join(''));
     if (t.ng && t.ng.length) html += sec('ng', '⚠️ やりがちNG', '<ul class="ngl">' + t.ng.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>');
@@ -801,6 +803,29 @@
       '<textarea class="memo" data-memo="' + t.id + '" rows="4" placeholder="例：〇〇駅の△△は週末満席。次は予約する">' + esc(note) + '</textarea></div></section>';
     if (t.card && cardMap[t.card]) html += '<ul class="list" style="margin-top:16px"><li><a class="row" href="#/card/' + t.card + '"><span class="ico">🗺️</span><div class="grow"><div>関連：' + esc(cardMap[t.card].title) + '</div></div><span class="chev">›</span></a></li></ul>';
     return html;
+  };
+
+
+  // ---------- 判断のコツ ----------
+  const JG = window.SAITEIGEN_JUDGE || { guides: [] };
+  views.judge = function () {
+    return header('判断のコツ', '#/sos') +
+      '<p class="lead">「予約しておく」と「その場で自然に」のように、場面で正解が変わる判断のヒントです。' + (JG.origin === 'ai' ? ' ' + AI_BADGE : '') + '</p>' +
+      '<ul class="list">' + JG.guides.map(g => '<li><a class="row" href="#/guide/' + g.id + '"><span class="ico">' + g.icon + '</span><div class="grow"><div>' + esc(g.title) + '</div><div class="sub">' + esc(g.q) + '</div></div><span class="chev">›</span></a></li>').join('') + '</ul>';
+  };
+  views.guide = function (id) {
+    const g = JG.guides.find(x => x.id === id);
+    if (!g) return notFound();
+    const side = (o, cls) => '<div class="card ' + cls + '"><strong>' + esc(o.label) + '</strong>' +
+      '<div class="sub" style="margin-top:8px">こんなとき</div><ul class="ngl">' + o.when.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' +
+      '<div class="sub" style="margin-top:8px">スマートにやるコツ</div><ul class="ngl">' + o.how.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
+    return header('判断のコツ', '#/judge') +
+      '<h1 class="ctitle">' + g.icon + ' ' + esc(g.title) + '</h1>' + (JG.origin === 'ai' ? '<div class="cardhead">' + AI_BADGE + '</div>' : '') +
+      '<p class="sub">' + esc(g.q) + '</p>' +
+      '<div class="card point"><div class="sub">判断の軸</div><strong>' + esc(g.point) + '</strong></div>' +
+      side(g.a, 'side-a') + side(g.b, 'side-b') +
+      (g.mid && g.mid.length ? '<div class="card tr-prep"><div class="sub">🤝 中間の選択肢</div><ul class="ngl">' + g.mid.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>' : '') +
+      (g.ng && g.ng.length ? '<div class="card ng"><div class="sub">⚠️ どちらでもNGになりがち</div><ul class="ngl">' + g.ng.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>' : '');
   };
 
   // ---------- フォーム ----------
@@ -1050,7 +1075,7 @@
     const fn = views[name] || views.map;
     const y = window.scrollY;
     $app.innerHTML = fn(name === 'learn' ? params.get('q') : (name === 'map' || name === 'ng') ? params.get('a') : arg);
-    const tab = { sos: 'map', trouble: 'map', ng: 'map', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
+    const tab = { judge: 'map', guide: 'map', sos: 'map', trouble: 'map', ng: 'map', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
       habits: 'habits', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'map';
     document.querySelectorAll('.tabbar a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
     if (hash !== lastRoute) window.scrollTo(0, 0); else window.scrollTo(0, y);

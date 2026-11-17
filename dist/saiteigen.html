@@ -307,6 +307,10 @@ li.row { padding: 10px 14px; }
 .bubble { background: var(--surface-2); border-radius: 14px 14px 14px 4px; padding: 10px 12px; margin: 8px 0 0; }
 .memo { width: 100%; font-size: 16px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 10px; resize: vertical; }
 
+.point { border-left: 4px solid var(--accent); }
+.side-a { border-top: 4px solid var(--lv2); }
+.side-b { border-top: 4px solid var(--lv3); }
+
 </style>
 </head>
 <body>
@@ -320,7 +324,7 @@ li.row { padding: 10px 14px; }
 </nav>
 <div id="sheet" class="sheet"></div>
 <div id="toast" class="toast" role="status"></div>
-<script>window.SAITEIGEN_VERSION = '0.6.0';</script>
+<script>window.SAITEIGEN_VERSION = '0.7.0';</script>
 <script>
 /*
  * カテゴリー・項目データ
@@ -1501,6 +1505,7 @@ window.SAITEIGEN_MAP = {
  *   ng     : やりがちなNG
  *   prep   : 次から備えること
  *   card   : 関連するマップのカード id（任意）
+ *   safety : true にすると「安全・法律に関わる」注意を表示（公的機関・保険会社の指示を優先）
  *
  * 【AI仮情報】本文はすべて AI が書いた仮の内容です（origin: 'ai'）。
  */
@@ -1517,7 +1522,8 @@ window.SAITEIGEN_TROUBLE = {
     { id: 'place', name: 'お店・場所', icon: '🏪' },
     { id: 'mood', name: '雰囲気・会話', icon: '💭' },
     { id: 'move', name: '移動・時間', icon: '🚃' },
-    { id: 'body', name: '体調・お金・もの', icon: '🩹' }
+    { id: 'body', name: '体調・お金・もの', icon: '🩹' },
+    { id: 'drive', name: '車・運転', icon: '🚗' }
   ],
   cases: [
     // ===== お店・場所 =====
@@ -1631,7 +1637,101 @@ window.SAITEIGEN_TROUBLE = {
       now: ['近くのコンビニ・ドラッグストアで買えないか考える', '代わりになるもので工夫する', '素直に「忘れちゃった」と言う'],
       say: ['「ごめん、忘れてきちゃった。ちょっとコンビニ寄ってもいい？」'],
       ng: ['隠そうとして余計に時間がかかる'],
-      prep: ['出かける前の持ち物リストを作る'], card: 't-kit' }
+      prep: ['出かける前の持ち物リストを作る'], card: 't-kit' },
+
+    // ===== 車・運転 =====
+    { id: 't-car-accident', group: 'drive', safety: true, title: '運転中に事故を起こした（ぶつけた・ぶつけられた）',
+      now: ['車を安全な場所に止め、ハザードを点ける', 'ケガ人がいないか確認。いれば救護し、119番', '後続車による事故を防ぐ（発炎筒・三角表示板）。同乗者は安全な場所へ', '警察（110番）に連絡する（小さな事故でも報告は法律上の義務とされています）', '相手の名前・連絡先・ナンバー・保険会社を確認し、現場や車の写真を撮る', '自分の保険会社に連絡する'],
+      say: ['（同乗者に）「大丈夫？ケガない？まず安全なところにいて」', '（同乗者に）「ごめん、今日の予定は一回置いて、ちゃんと対応させて」', '（落ち着いたら）「怖い思いさせてごめん。今日はゆっくり帰ろう」'],
+      ng: ['その場で「大丈夫です」と示談してしまう・警察を呼ばない', '動揺して同乗者に当たる', '予定に間に合わせようと急いで現場を離れる', 'すぐに運転を再開して、また焦って運転する'],
+      prep: ['任意保険の内容とロードサービスの連絡先をスマホに登録しておく', '車に発炎筒・三角表示板があるか確認', '予定に余裕を持たせ、急がない運転をする'] },
+    { id: 't-car-breakdown', group: 'drive', safety: true, title: '車が故障した・パンク・バッテリー上がり・ガス欠',
+      now: ['安全な場所に止め、ハザードを点ける', '高速道路なら車外のガードレールの外側へ避難', '保険会社のロードサービスかJAFに連絡', '同乗者が寒くない・暑くないか気づかう'],
+      say: ['「ごめん、ちょっと車の調子悪いみたい。ロードサービス呼ぶから、ここで待ってて」', '「来るまで少しかかるみたい。今日は予定変えて、近くでゆっくりしない？」'],
+      ng: ['慣れない修理を無理にやる', '高速道路で車内や車の前後に留まる'],
+      prep: ['保険のロードサービスの有無と電話番号を確認', '長距離の前にガソリン・タイヤ・バッテリーを確認'] },
+    { id: 't-car-jam', group: 'drive', title: '渋滞で間に合わない・駐車場がいっぱい',
+      now: ['予約していれば、間に合わないと分かった時点で店に連絡', '運転中はスマホを触らない（同乗者に頼むか、止まってから）', '駐車場は近くのコインパーキングを地図アプリで探す', '焦って運転しない'],
+      say: ['「渋滞ハマっちゃったね。お店に遅れるって連絡してもらってもいい？」', '「せっかくだし、着くまでのんびり行こ。音楽かけていい？」'],
+      ng: ['イライラして運転が荒くなる（同乗者は怖い）', '運転中にスマホを操作する'],
+      prep: ['イベント日・連休は渋滞を見込んで早めに出る', '目的地近くの駐車場を2つ調べておく、または公共交通機関を検討'] }
+  ]
+};
+
+</script>
+<script>
+/*
+ * 判断のコツ（どっちがスマート？）
+ * ------------------------------------------------------------
+ * 「予約しておく」と「その場で自然に行く」のように、正解が場面で変わる判断を整理する。
+ *
+ *   id     : 一意のID（変更しない）
+ *   title  : 判断のテーマ
+ *   q      : 迷う問い
+ *   a / b  : 2つの選択肢 { label, when: [こういう場面なら], how: [スマートにやるコツ] }
+ *   mid    : 中間の選択肢（両方のいいとこ取り）
+ *   ng     : どちらを選んでもNGになりがちなこと
+ *   point  : 判断の軸（ひとことで）
+ *
+ * 【AI仮情報】本文はすべて AI が書いた仮の内容です（origin: 'ai'）。
+ */
+window.SAITEIGEN_JUDGE = {
+  origin: 'ai',
+  guides: [
+    { id: 'j-reserve', icon: '📅', title: '予約する？その場で行く？', q: 'お店、事前に予約しておくべき？ふらっと行く方が自然？',
+      point: '「入れなかったときのダメージ」が大きいほど予約。気楽な場面ほど、その場で。',
+      a: { label: '予約しておく方がスマート',
+        when: ['初めてのデート・まだ距離がある相手', '記念日・誕生日・お祝い', '週末や祝前日の夜、人気店', 'コース料理・個室・カウンターなど席が限られる店', '相手が遠くから来る・時間が限られている', '3人以上'],
+        how: ['予約したことを大げさに言わない（「ここ空いてるか確認しといた」くらい）', '店の候補は事前に相手の好みを聞いて決める', '時間に余裕を持たせる（遅れても大丈夫な時間に）', '行けなくなったら、すぐキャンセル連絡'] },
+      b: { label: 'その場で自然に行く方がスマート',
+        when: ['付き合いが長い・気心が知れている', '相手の気分で決めたい日（散歩の途中など）', 'カフェ・ランチ・軽く一杯', '2軒目', '予定がはっきりしない日'],
+        how: ['行けそうな候補を2〜3個、頭に入れておく（下調べはする）', '「お腹すいた？あそこ気になってたんだけど」と自然に誘う', '入れなかったときの次の候補も持っておく'] },
+      mid: ['「席だけ予約」して、料理はその場で選ぶ', '当日、行く前に電話で「今から2人入れますか？」と聞く', '予約はしないが、混む時間（19時前後）を外して早めに行く', '予約しておき、相手には「行ってみたい店がある」とだけ言う'],
+      ng: ['予約したことを恩着せがましく言う', '下調べゼロで当日さまよう', '相手の意見を聞かずに高い店を予約する', '無断キャンセル'] },
+
+    { id: 'j-pay', icon: '💴', title: '奢る？割り勘？', q: '会計、奢った方がいい？割り勘の方が相手も気が楽？',
+      point: '「誘った側・関係性・相手の気持ち」で決める。正解は人によって違う。',
+      a: { label: '奢る（多めに出す）方がスマート',
+        when: ['自分から誘った', 'お祝い・お礼の場', '収入や年齢に差がある', '相手が遠くまで来てくれた'],
+        how: ['相手がトイレに行っている間など、さりげなく済ませる', '「今日は誘ったから」と理由を一言添える', '相手が気にしていたら、次は相手に出してもらう（カフェ代など）'] },
+      b: { label: '割り勘の方がスマート',
+        when: ['対等な関係でいたい相手', '相手が「払う」と強く言っている', '頻繁に会う間柄', '相手が奢られることを負担に感じそう'],
+        how: ['送金アプリでその場で済ませる', '端数は自分が多めに持つ', 'お金の話を長引かせない'] },
+      mid: ['1軒目は自分、2軒目（カフェなど）は相手', '多めに出して「ここは〇〇円でいいよ」', '交互に払う'],
+      ng: ['レジ前でもめる', '細かい端数まで請求する', '奢ったことを後で持ち出す'] },
+
+    { id: 'j-next', icon: '🌙', title: '2軒目に誘う？今日は帰る？', q: 'いい雰囲気だけど、もう一軒誘っていい？それとも今日はここまで？',
+      point: '相手の「もう少しいたい」サインと、翌日の予定・終電で決める。迷ったら相手に選べる形で聞く。',
+      a: { label: '2軒目に誘う',
+        when: ['会話が盛り上がっていて、相手も楽しそう', '時間・終電に余裕がある', '相手から「このあとどうする？」と聞かれた'],
+        how: ['「もう少し話したいんだけど、時間大丈夫？」と相手が断りやすい聞き方で', '近場の軽めの店（カフェ・バー）を提案', '終電の時間を先に確認しておく'] },
+      b: { label: '今日は帰る方がスマート',
+        when: ['相手が疲れていそう・翌日早い', '会話が落ち着いてきた', 'まだ距離がある関係', '一番盛り上がったタイミング'],
+        how: ['「今日楽しかった。またご飯行こう」と次につなげる', '駅まで送る', '帰ってから「今日はありがとう」と一言送る'] },
+      mid: ['「次はここ行こう」と次回の約束をして帰る', '帰り道を少し遠回りして散歩する'],
+      ng: ['しつこく誘う', '終電を気にせず引き止める', '帰ると決めてから不機嫌になる'] },
+
+    { id: 'j-surprise', icon: '🎉', title: 'サプライズする？しない？', q: '誕生日や記念日、サプライズした方が喜ぶ？',
+      point: '「相手がサプライズを好きか」がすべて。分からなければ、控えめなサプライズにする。',
+      a: { label: 'サプライズする',
+        when: ['相手がサプライズ好き（過去に話していた）', '付き合いが長く、好みをよく知っている', '二人きりで、人目が少ない'],
+        how: ['小さめに（ケーキ・メッセージ・プレゼント程度）', '相手の予定を潰さない', '失敗しても笑える規模にする'] },
+      b: { label: '事前に伝える・一緒に決める',
+        when: ['相手が目立つのが苦手', 'まだ好みが分からない', '大人数・人前になる'],
+        how: ['「誕生日、行きたい店ある？」と一緒に決める', '欲しいものを聞いてしまう', '当日はメッセージを添えるだけでも十分'] },
+      mid: ['日時と店は伝え、プレゼントやデザートだけサプライズ'],
+      ng: ['人前で大げさなサプライズ（店員総出の演出など）を相手の好みを知らずにする', '高価すぎて相手が引く', '相手の予定を無視する'] },
+
+    { id: 'j-decide', icon: '🧭', title: '自分で決める？相手に選んでもらう？', q: '行き先や店、自分が決めた方がいい？相手の希望を聞いた方がいい？',
+      point: '「候補は自分が出し、最後は相手が選ぶ」が多くの場面で無難。',
+      a: { label: '自分で決めて引っ張る',
+        when: ['相手が「任せる」と言っている', '自分の方が土地勘・情報がある', '時間がない・その場で決める必要がある'],
+        how: ['決めた理由を一言添える（「ここ雰囲気いいらしくて」）', '相手の苦手なもの（食べ物など）は事前に確認'] },
+      b: { label: '相手に選んでもらう',
+        when: ['相手にこだわりがありそう', 'お祝い・相手が主役の日', 'まだ好みが分からない'],
+        how: ['「どうする？」ではなく、候補を2〜3つ見せて選んでもらう', '相手の選択を否定しない'] },
+      mid: ['自分が候補を2〜3つ出して、相手が選ぶ'],
+      ng: ['「どこでもいい」「なんでもいい」の繰り返し', '相手の希望を聞いたのに結局自分の案にする'] }
   ]
 };
 
@@ -2413,6 +2513,7 @@ window.SAITEIGEN_TROUBLE = {
   views.sos = function () {
     let html = header('トラブル対処', '#/map') +
       '<p class="lead">二人でいるとき、予定どおりにいかなかったときの対処です。その場で開いて使ってください。' + (TR.origin === 'ai' ? ' ' + AI_BADGE : '') + '</p>' +
+      '<a class="card cta" href="#/judge"><strong>🤔 判断のコツ（出かける前に）</strong><span class="sub">予約する？その場で行く？ 奢る？割り勘？ など</span></a>' +
       '<details class="card principles"><summary><strong>困ったときの5原則</strong> <span class="sub">（タップで開く）</span></summary><ol>' +
       TR.principles.map(p => '<li><strong>' + esc(p.t) + '</strong><span class="sub">' + esc(p.d) + '</span></li>').join('') + '</ol></details>';
     TR.groups.forEach(g => {
@@ -2432,6 +2533,7 @@ window.SAITEIGEN_TROUBLE = {
     const sec = (cls, title, body) => '<div class="card ' + cls + '"><div class="sub">' + title + '</div>' + body + '</div>';
     let html = header(g.icon + ' ' + g.name, '#/sos') +
       '<h1 class="ctitle">' + esc(t.title) + '</h1>' + (TR.origin === 'ai' ? '<div class="cardhead">' + AI_BADGE + '</div>' : '') +
+      (t.safety ? '<div class="notice"><strong>安全・法律に関わる内容です。</strong>人命と安全を最優先に、警察・消防・保険会社の指示に従ってください。</div>' : '') +
       sec('tr-now', '🚑 まずこれ', '<ol class="how">' + t.now.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol>');
     if (t.say && t.say.length) html += sec('tr-say', '💬 言い方の例', t.say.map(x => '<p class="bubble">' + esc(x) + '</p>').join(''));
     if (t.ng && t.ng.length) html += sec('ng', '⚠️ やりがちNG', '<ul class="ngl">' + t.ng.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>');
@@ -2440,6 +2542,29 @@ window.SAITEIGEN_TROUBLE = {
       '<textarea class="memo" data-memo="' + t.id + '" rows="4" placeholder="例：〇〇駅の△△は週末満席。次は予約する">' + esc(note) + '</textarea></div></section>';
     if (t.card && cardMap[t.card]) html += '<ul class="list" style="margin-top:16px"><li><a class="row" href="#/card/' + t.card + '"><span class="ico">🗺️</span><div class="grow"><div>関連：' + esc(cardMap[t.card].title) + '</div></div><span class="chev">›</span></a></li></ul>';
     return html;
+  };
+
+
+  // ---------- 判断のコツ ----------
+  const JG = window.SAITEIGEN_JUDGE || { guides: [] };
+  views.judge = function () {
+    return header('判断のコツ', '#/sos') +
+      '<p class="lead">「予約しておく」と「その場で自然に」のように、場面で正解が変わる判断のヒントです。' + (JG.origin === 'ai' ? ' ' + AI_BADGE : '') + '</p>' +
+      '<ul class="list">' + JG.guides.map(g => '<li><a class="row" href="#/guide/' + g.id + '"><span class="ico">' + g.icon + '</span><div class="grow"><div>' + esc(g.title) + '</div><div class="sub">' + esc(g.q) + '</div></div><span class="chev">›</span></a></li>').join('') + '</ul>';
+  };
+  views.guide = function (id) {
+    const g = JG.guides.find(x => x.id === id);
+    if (!g) return notFound();
+    const side = (o, cls) => '<div class="card ' + cls + '"><strong>' + esc(o.label) + '</strong>' +
+      '<div class="sub" style="margin-top:8px">こんなとき</div><ul class="ngl">' + o.when.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>' +
+      '<div class="sub" style="margin-top:8px">スマートにやるコツ</div><ul class="ngl">' + o.how.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>';
+    return header('判断のコツ', '#/judge') +
+      '<h1 class="ctitle">' + g.icon + ' ' + esc(g.title) + '</h1>' + (JG.origin === 'ai' ? '<div class="cardhead">' + AI_BADGE + '</div>' : '') +
+      '<p class="sub">' + esc(g.q) + '</p>' +
+      '<div class="card point"><div class="sub">判断の軸</div><strong>' + esc(g.point) + '</strong></div>' +
+      side(g.a, 'side-a') + side(g.b, 'side-b') +
+      (g.mid && g.mid.length ? '<div class="card tr-prep"><div class="sub">🤝 中間の選択肢</div><ul class="ngl">' + g.mid.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>' : '') +
+      (g.ng && g.ng.length ? '<div class="card ng"><div class="sub">⚠️ どちらでもNGになりがち</div><ul class="ngl">' + g.ng.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul></div>' : '');
   };
 
   // ---------- フォーム ----------
@@ -2689,7 +2814,7 @@ window.SAITEIGEN_TROUBLE = {
     const fn = views[name] || views.map;
     const y = window.scrollY;
     $app.innerHTML = fn(name === 'learn' ? params.get('q') : (name === 'map' || name === 'ng') ? params.get('a') : arg);
-    const tab = { sos: 'map', trouble: 'map', ng: 'map', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
+    const tab = { judge: 'map', guide: 'map', sos: 'map', trouble: 'map', ng: 'map', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
       habits: 'habits', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'map';
     document.querySelectorAll('.tabbar a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
     if (hash !== lastRoute) window.scrollTo(0, 0); else window.scrollTo(0, y);
