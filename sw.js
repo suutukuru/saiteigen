@@ -1,5 +1,5 @@
 /* オフライン用キャッシュ。ファイルを更新したら VERSION を上げてください。 */
-const VERSION = 'v0.5.0';
+const VERSION = 'v0.5.1';
 const CACHE = 'saiteigen-' + VERSION;
 const ASSETS = [
   './', './index.html', './css/style.css',
