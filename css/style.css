@@ -278,3 +278,15 @@ li.row { padding: 10px 14px; }
 .ng .title { display: block; font-weight: 700; color: var(--text); margin-bottom: 4px; }
 .ngl { margin: 6px 0 0; padding-left: 20px; }
 .ngl li { margin: 4px 0; }
+
+/* ---- トラブル対処 ---- */
+.sos-btn { display: block; text-align: center; font-weight: 700; padding: 11px; margin: 10px 0; border-radius: 12px; background: var(--lv1-soft); color: var(--lv1); border: 1px solid var(--lv1); }
+.principles summary { cursor: pointer; list-style: none; }
+.principles summary::-webkit-details-marker { display: none; }
+.principles ol { margin: 8px 0 0; padding-left: 20px; }
+.principles li { margin: 8px 0; }
+.principles li .sub { display: block; }
+.tr-now { border-left: 4px solid var(--accent); }
+.tr-prep { background: var(--accent-soft); border-color: transparent; }
+.bubble { background: var(--surface-2); border-radius: 14px 14px 14px 4px; padding: 10px 12px; margin: 8px 0 0; }
+.memo { width: 100%; font-size: 16px; border: 1px solid var(--line); background: var(--surface); border-radius: 10px; padding: 10px; resize: vertical; }

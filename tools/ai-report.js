@@ -3,7 +3,7 @@
 const path = require('path');
 global.window = {};
 const root = path.join(__dirname, '..');
-['js/data.js', 'js/content.js', 'js/ai-draft/01-05.js', 'js/ai-draft/06-10.js', 'js/ai-draft/11-14.js', 'js/map.js']
+['js/data.js', 'js/content.js', 'js/ai-draft/01-05.js', 'js/ai-draft/06-10.js', 'js/ai-draft/11-14.js', 'js/map.js', 'js/trouble.js']
   .forEach(f => require(path.join(root, f)));
 const D = window.SAITEIGEN_DATA, C = window.SAITEIGEN_CONTENT, A = window.SAITEIGEN_AI_DRAFT, M = window.SAITEIGEN_MAP;
 const items = D.categories.flatMap(c => c.items.map(i => Object.assign({ cat: c.no + ' ' + c.name }, i)));
@@ -18,6 +18,8 @@ console.log('人が確認した記事がある項目     :', humanCovered.size);
 console.log('AI仮情報 (content.js の記事)   :', aiArticles.length, '本');
 console.log('AI仮情報 (ai-draft で表示中)   :', aiDraftUsed.length, '項目');
 console.log('AI仮情報 (マップのカード)      :', aiCards.length, '/', M.cards.length, '枚');
+const T = window.SAITEIGEN_TROUBLE;
+console.log('AI仮情報 (トラブル対処)        :', T.origin === 'ai' ? T.cases.length : 0, '/', T.cases.length, '件');
 console.log('内容なし                       :', none.length, '項目');
 const unknown = Object.keys(A).filter(k => !items.some(i => i.id === k));
 if (unknown.length) console.log('⚠ data.js に無い ai-draft のキー:', unknown.join(', '));

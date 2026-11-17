@@ -49,7 +49,7 @@
   // ---------- 状態 ----------
   const blank = () => ({
     version: 1, status: {}, checks: {}, focus: {}, suggestion: {},
-    habits: [], belongings: [], wishes: [], statusLog: [], practiceLog: [], map: {},
+    habits: [], belongings: [], wishes: [], statusLog: [], practiceLog: [], map: {}, troubleNotes: {},
     goal: '', onboarded: false
   });
   let S = load();
@@ -284,6 +284,7 @@
         '<button class="link small" data-act="onboarded">閉じる</button></div>';
     }
 
+    html += '<a class="sos-btn" href="#/sos">🆘 いま困ってる（トラブル対処）</a>';
     html += '<section><h2>今日のタスク <span class="count">' + doneCount + '/' + due.length + '</span></h2>';
     if (due.length || maint.length) {
       html += '<ul class="list">' + due.map(habitRow).join('') +
@@ -567,6 +568,7 @@
       '<div><dt>欲しいもの</dt><dd>' + S.wishes.filter(w => !w.purchased).length + '</dd></div></dl></div>' +
       '<ul class="list">' +
       '<li><a class="row" href="#/status"><span class="ico">📊</span><div class="grow">自分の状態</div><span class="chev">›</span></a></li>' +
+      '<li><a class="row" href="#/sos"><span class="ico">🆘</span><div class="grow">トラブル対処</div><span class="chev">›</span></a></li>' +
       '<li><a class="row" href="#/suggest"><span class="ico">💡</span><div class="grow">おすすめ一覧</div><span class="chev">›</span></a></li>' +
       '<li><a class="row" href="#/about"><span class="ico">ℹ️</span><div class="grow">このアプリと情報の信頼性について</div><span class="chev">›</span></a></li>' +
       '</ul>' +
@@ -645,7 +647,8 @@
     const areas = area && areaMap[area] ? [areaMap[area]] : MAP.areas;
     const answered = visibleCards().filter(c => S.map[c.id]).length;
     const all = visibleCards().length;
-    let html = '<header class="hero"><div class="sub">普通にできるようになる。そして、格好よくなる。</div><h1>さいていげんマップ</h1></header>';
+    let html = '<header class="hero"><div class="sub">普通にできるようになる。そして、格好よくなる。</div><h1>さいていげんマップ</h1></header>' +
+      '<a class="sos-btn" href="#/sos">🆘 いま困ってる（トラブル対処）</a>';
     if (answered < all) {
       html += '<a class="card cta" href="#/diag"><strong>' + (answered ? '診断のつづき（' + answered + '/' + all + '）' : 'まず診断してみる（約' + Math.ceil(all / 10) + '分）') + '</strong>' +
         '<span class="sub">はい／いいえで答えるだけで、自分の「抜け」がマップに出ます。答えはこの端末にしか残りません。</span></a>';
@@ -759,6 +762,44 @@
     });
     if (!g.length) html += '<div class="empty">「まだ」の項目はありません。すばらしい！</div>';
     html += '<div class="actions"><a class="btn primary" href="#/map">マップを見る</a><button class="btn ghost" data-act="diag-reset">診断をやり直す</button></div>';
+    return html;
+  };
+
+
+  // ---------- トラブル対処（SOS） ----------
+  const TR = window.SAITEIGEN_TROUBLE || { cases: [], groups: [], principles: [] };
+  const trMap = {};
+  TR.cases.forEach(t => { trMap[t.id] = t; });
+
+  views.sos = function () {
+    let html = header('トラブル対処', '#/map') +
+      '<p class="lead">二人でいるとき、予定どおりにいかなかったときの対処です。その場で開いて使ってください。' + (TR.origin === 'ai' ? ' ' + AI_BADGE : '') + '</p>' +
+      '<details class="card principles"><summary><strong>困ったときの5原則</strong> <span class="sub">（タップで開く）</span></summary><ol>' +
+      TR.principles.map(p => '<li><strong>' + esc(p.t) + '</strong><span class="sub">' + esc(p.d) + '</span></li>').join('') + '</ol></details>';
+    TR.groups.forEach(g => {
+      const cs = TR.cases.filter(t => t.group === g.id);
+      html += '<section><h2>' + g.icon + ' ' + esc(g.name) + '</h2><ul class="list">' + cs.map(t =>
+        '<li><a class="row" href="#/trouble/' + t.id + '"><div class="grow">' + esc(t.title) +
+        ((S.troubleNotes || {})[t.id] ? '<div class="sub">📝 メモあり</div>' : '') + '</div><span class="chev">›</span></a></li>').join('') + '</ul></section>';
+    });
+    return html;
+  };
+
+  views.trouble = function (id) {
+    const t = trMap[id];
+    if (!t) return notFound();
+    const g = TR.groups.find(x => x.id === t.group);
+    const note = (S.troubleNotes || {})[id] || '';
+    const sec = (cls, title, body) => '<div class="card ' + cls + '"><div class="sub">' + title + '</div>' + body + '</div>';
+    let html = header(g.icon + ' ' + g.name, '#/sos') +
+      '<h1 class="ctitle">' + esc(t.title) + '</h1>' + (TR.origin === 'ai' ? '<div class="cardhead">' + AI_BADGE + '</div>' : '') +
+      sec('tr-now', '🚑 まずこれ', '<ol class="how">' + t.now.map(x => '<li>' + esc(x) + '</li>').join('') + '</ol>');
+    if (t.say && t.say.length) html += sec('tr-say', '💬 言い方の例', t.say.map(x => '<p class="bubble">' + esc(x) + '</p>').join(''));
+    if (t.ng && t.ng.length) html += sec('ng', '⚠️ やりがちNG', '<ul class="ngl">' + t.ng.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>');
+    if (t.prep && t.prep.length) html += sec('tr-prep', '🧭 次から備える', '<ul class="ngl">' + t.prep.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>');
+    html += '<section><h2>📝 自分メモ</h2><div class="card"><p class="sub" style="margin:0 0 6px">実際にあったこと・次はこうする、など。この端末にだけ保存されます。</p>' +
+      '<textarea class="memo" data-memo="' + t.id + '" rows="4" placeholder="例：〇〇駅の△△は週末満席。次は予約する">' + esc(note) + '</textarea></div></section>';
+    if (t.card && cardMap[t.card]) html += '<ul class="list" style="margin-top:16px"><li><a class="row" href="#/card/' + t.card + '"><span class="ico">🗺️</span><div class="grow"><div>関連：' + esc(cardMap[t.card].title) + '</div></div><span class="chev">›</span></a></li></ul>';
     return html;
   };
 
@@ -978,6 +1019,16 @@
     }
     save(); render();
   });
+  let memoTimer;
+  document.addEventListener('input', e => {
+    const id = e.target.dataset && e.target.dataset.memo;
+    if (!id) return;
+    S.troubleNotes = S.troubleNotes || {};
+    const v = e.target.value;
+    if (v.trim()) S.troubleNotes[id] = v; else delete S.troubleNotes[id];
+    clearTimeout(memoTimer);
+    memoTimer = setTimeout(save, 400);
+  });
   document.addEventListener('change', e => {
     if (e.target.dataset && e.target.dataset.act === 'import' && e.target.files[0]) importData(e.target.files[0]);
   });
@@ -999,7 +1050,7 @@
     const fn = views[name] || views.map;
     const y = window.scrollY;
     $app.innerHTML = fn(name === 'learn' ? params.get('q') : (name === 'map' || name === 'ng') ? params.get('a') : arg);
-    const tab = { ng: 'map', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
+    const tab = { sos: 'map', trouble: 'map', ng: 'map', map: 'map', card: 'map', diag: 'map', 'diag-result': 'map', home: 'home', suggest: 'home', learn: 'map', articles: 'map', cat: 'map', item: 'map', article: 'map',
       habits: 'habits', belongings: 'own', maint: 'own', wish: 'own', my: 'my', status: 'my', about: 'my' }[name] || 'map';
     document.querySelectorAll('.tabbar a').forEach(a => a.classList.toggle('on', a.dataset.tab === tab));
     if (hash !== lastRoute) window.scrollTo(0, 0); else window.scrollTo(0, y);
